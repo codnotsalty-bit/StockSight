@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create the ratios chart
         createRatiosChart();
         
+        // Create the value investing metrics chart
+        createValueInvestingChart();
+        
         // Create the capital structure chart
         createCapitalStructureChart();
     }
@@ -101,6 +104,99 @@ function createRatiosChart() {
     } else {
         // Show a message if no data is available
         document.getElementById('ratiosChart').parentNode.innerHTML = '<div class="alert alert-info">No ratio data available for this stock.</div>';
+    }
+}
+
+function createValueInvestingChart() {
+    // Create a chart for Value Investing Metrics (Magic Formula, Graham, AlphaSpreads)
+    // Check if we have a canvas element for this chart
+    const valueChartElement = document.createElement('canvas');
+    valueChartElement.id = 'valueInvestingChart';
+    
+    // Add it after the Value Investing Metrics card body
+    const valueInvestingHeader = document.querySelector('.card-header h4');
+    let valueCardBody = null;
+    
+    // Find the Value Investing Metrics card
+    if (valueInvestingHeader) {
+        const headers = document.querySelectorAll('.card-header h4');
+        for (let i = 0; i < headers.length; i++) {
+            if (headers[i].textContent.includes('Value Investing Metrics')) {
+                valueCardBody = headers[i].closest('.card').querySelector('.card-body');
+                break;
+            }
+        }
+    }
+    if (valueCardBody) {
+        const chartContainer = document.createElement('div');
+        chartContainer.className = 'chart-container mt-4';
+        chartContainer.appendChild(valueChartElement);
+        valueCardBody.appendChild(chartContainer);
+        
+        const ctx = valueChartElement.getContext('2d');
+        
+        // Define chart data
+        let hasData = false;
+        const datasets = [];
+        const labels = [];
+        
+        // Current price reference line
+        if (resultData.grahamValue !== null && resultData.grahamUpside !== null) {
+            hasData = true;
+            
+            // Current Price vs Graham Value comparison
+            labels.push('Current Price', 'Graham Value');
+            datasets.push({
+                label: 'Price vs Value',
+                data: [resultData.grahamValue / (1 + resultData.grahamUpside/100), resultData.grahamValue],
+                backgroundColor: ['rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)'],
+                borderColor: ['rgba(54, 162, 235, 1)', 'rgba(75, 192, 192, 1)'],
+                borderWidth: 1
+            });
+        }
+        
+        // Create the chart if we have data
+        if (hasData) {
+            const valueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',  // Horizontal bar chart
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Price vs Intrinsic Value Comparison'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.raw;
+                                    return `${label}: ${new Intl.NumberFormat('en-US', { 
+                                        style: 'currency',
+                                        currency: 'USD'
+                                    }).format(value)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Value ($)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 }
 

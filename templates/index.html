@@ -182,6 +182,7 @@
                                     <th>Dividend Yield</th>
                                     <th>Dividend Rate</th>
                                     <th>Magic Score</th>
+                                    <th>Graham Value</th>
                                     <th>Decision</th>
                                 </tr>
                             </thead>
@@ -201,6 +202,14 @@
                                     <td>{{ item.formatted_dividend_yield }}</td>
                                     <td>{{ item.formatted_dividend_rate }}</td>
                                     <td>{{ item.formatted_magic_score }}</td>
+                                    <td>
+                                        {{ item.formatted_graham_value }}
+                                        {% if item.graham_upside is defined and item.graham_upside is not none %}
+                                            <small class="{% if item.graham_upside > 0 %}text-success{% elif item.graham_upside < 0 %}text-danger{% endif %}">
+                                                ({{ item.formatted_graham_upside }})
+                                            </small>
+                                        {% endif %}
+                                    </td>
                                     <td><span class="badge bg-{{ item.decision_class }}">{{ item.buy_decision }}</span></td>
                                 </tr>
                                 {% endfor %}
@@ -451,6 +460,47 @@
                 </div>
             </div>
             
+            <!-- Value Investing Metrics Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Value Investing Metrics</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>Magic Formula Score</h5>
+                                <div class="ratio-value">{{ result.formatted_magic_score }}</div>
+                                <p class="text-muted small">Combined EY & ROC (higher is better)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>AlphaSpreads Score</h5>
+                                <div class="ratio-value">{{ result.formatted_alpha_score }}</div>
+                                <p class="text-muted small">Earnings quality indicator</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>Graham Value</h5>
+                                <div class="ratio-value">{{ result.formatted_graham_value }}</div>
+                                <p class="text-muted small">Based on Graham's formula</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>Graham Upside</h5>
+                                <div class="ratio-value {% if result.graham_upside and result.graham_upside > 0 %}text-success{% elif result.graham_upside and result.graham_upside < 0 %}text-danger{% endif %}">
+                                    {{ result.formatted_graham_upside }}
+                                </div>
+                                <p class="text-muted small">Potential margin of safety</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Capital Structure Card -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header">
@@ -474,7 +524,11 @@
                 totalDebt: {{ result.total_debt if result.total_debt is not none else 'null' }},
                 cash: {{ result.cash if result.cash is not none else 'null' }},
                 dividendYield: {{ result.dividend_yield if result.dividend_yield is not none else 'null' }},
-                fiveYearAvgDividendYield: {{ result.five_year_avg_dividend_yield if result.five_year_avg_dividend_yield is not none else 'null' }}
+                fiveYearAvgDividendYield: {{ result.five_year_avg_dividend_yield if result.five_year_avg_dividend_yield is not none else 'null' }},
+                magicScore: {{ result.magic_score if result.magic_score is not none else 'null' }},
+                alphaSpreadsScore: {{ result.alpha_spreads_score if result.alpha_spreads_score is not none else 'null' }},
+                grahamValue: {{ result.graham_value if result.graham_value is not none else 'null' }},
+                grahamUpside: {{ result.graham_upside if result.graham_upside is not none else 'null' }}
             };
         </script>
         {% endif %}
