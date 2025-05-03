@@ -470,7 +470,40 @@ def index():
                     if not batch_results:
                         error_message = "Could not retrieve valid data for any of the provided tickers."
                     
-                    # Return early with batch results
+                    # Apply Magic Formula ranking to batch results
+                    if batch_results:
+                        # Create two separate rankings (higher is better for both metrics)
+                        earnings_yield_ranking = sorted(batch_results, key=lambda x: x.get('earnings_yield') if x.get('earnings_yield') is not None else -1, reverse=True)
+                        roc_ranking = sorted(batch_results, key=lambda x: x.get('return_on_capital') if x.get('return_on_capital') is not None else -1, reverse=True)
+                        
+                        # Create a dictionary to hold the rankings
+                        ey_rank_dict = {}
+                        roc_rank_dict = {}
+                        
+                        # Assign Earnings Yield rank (1 is best)
+                        for i, stock in enumerate(earnings_yield_ranking):
+                            ey_rank_dict[stock['ticker']] = i + 1
+                            
+                        # Assign Return on Capital rank (1 is best)
+                        for i, stock in enumerate(roc_ranking):
+                            roc_rank_dict[stock['ticker']] = i + 1
+                        
+                        # Calculate combined rank and add to each stock
+                        for stock in batch_results:
+                            ticker = stock['ticker']
+                            ey_rank = ey_rank_dict.get(ticker, len(batch_results))
+                            roc_rank = roc_rank_dict.get(ticker, len(batch_results))
+                            
+                            # The combined rank is the sum of the two ranks (lower is better)
+                            combined_rank = ey_rank + roc_rank
+                            stock['magic_rank'] = combined_rank
+                            stock['ey_rank'] = ey_rank
+                            stock['roc_rank'] = roc_rank
+                        
+                        # Sort by Magic Formula rank (lower is better)
+                        batch_results = sorted(batch_results, key=lambda x: x.get('magic_rank', 999))
+                    
+                    # Return with batch results
                     return render_template('index.html', 
                                           batch_results=batch_results, 
                                           error_message=error_message,

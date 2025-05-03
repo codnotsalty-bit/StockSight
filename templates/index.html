@@ -102,6 +102,9 @@
                         <button class="btn btn-sm btn-outline-secondary ms-2" id="sortByDividend">
                             <i class="fas fa-sort-amount-down me-1"></i>Sort by Dividend
                         </button>
+                        <button class="btn btn-sm btn-outline-success ms-2" id="sortByMagicRank">
+                            <i class="fas fa-trophy me-1"></i>Magic Formula Rank
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -181,12 +184,17 @@
                             </thead>
                             <tbody>
                                 {% for item in batch_results %}
-                                <tr data-ey="{{ item.earnings_yield|default(0) }}" data-roc="{{ item.return_on_capital|default(0) }}" data-div="{{ item.dividend_yield|default(0) }}">
-                                    <td><a href="/?ticker={{ item.ticker }}&action=single" class="fw-bold">{{ item.ticker }}</a></td>
+                                <tr data-ey="{{ item.earnings_yield|default(0) }}" data-roc="{{ item.return_on_capital|default(0) }}" data-div="{{ item.dividend_yield|default(0) }}" data-magic="{{ item.magic_rank|default(999) }}">
+                                    <td>
+                                        {% if item.magic_rank is defined and item.magic_rank <= 3 %}
+                                            <span class="badge bg-warning text-dark me-1">#{{ item.magic_rank }}</span>
+                                        {% endif %}
+                                        <a href="/?ticker={{ item.ticker }}&action=single" class="fw-bold">{{ item.ticker }}</a>
+                                    </td>
                                     <td>{{ item.company_name }}</td>
                                     <td>{{ item.formatted_current_price }}</td>
-                                    <td>{{ item.formatted_earnings_yield }}</td>
-                                    <td>{{ item.formatted_return_on_capital }}</td>
+                                    <td>{{ item.formatted_earnings_yield }} <small class="text-muted">(#{{ item.ey_rank }})</small></td>
+                                    <td>{{ item.formatted_return_on_capital }} <small class="text-muted">(#{{ item.roc_rank }})</small></td>
                                     <td>{{ item.formatted_dividend_yield }}</td>
                                     <td>{{ item.formatted_magic_score }}</td>
                                     <td><span class="badge bg-{{ item.decision_class }}">{{ item.buy_decision }}</span></td>
@@ -224,6 +232,13 @@
                         });
                     }
                     
+                    const sortByMagicRankBtn = document.getElementById('sortByMagicRank');
+                    if (sortByMagicRankBtn && table) {
+                        sortByMagicRankBtn.addEventListener('click', function() {
+                            sortTableAscending(table, 'data-magic');
+                        });
+                    }
+                    
                     function sortTable(table, attr) {
                         const tbody = table.querySelector('tbody');
                         const rows = Array.from(tbody.querySelectorAll('tr'));
@@ -232,6 +247,26 @@
                             const aValue = parseFloat(a.getAttribute(attr)) || 0;
                             const bValue = parseFloat(b.getAttribute(attr)) || 0;
                             return bValue - aValue;  // Descending order
+                        });
+                        
+                        // Clear and re-add sorted rows
+                        while (tbody.firstChild) {
+                            tbody.removeChild(tbody.firstChild);
+                        }
+                        
+                        rows.forEach(row => {
+                            tbody.appendChild(row);
+                        });
+                    }
+                    
+                    function sortTableAscending(table, attr) {
+                        const tbody = table.querySelector('tbody');
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+                        
+                        rows.sort((a, b) => {
+                            const aValue = parseFloat(a.getAttribute(attr)) || 999;
+                            const bValue = parseFloat(b.getAttribute(attr)) || 999;
+                            return aValue - bValue;  // Ascending order (lower is better for Magic Rank)
                         });
                         
                         // Clear and re-add sorted rows
