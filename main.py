@@ -292,7 +292,12 @@ def fetch_financial_data(ticker):
         'dividend_rate': dividend_rate,
         'dividend_yield': dividend_yield,
         'ex_dividend_date': ex_dividend_date,
-        'five_year_avg_dividend_yield': five_year_avg_dividend_yield
+        'five_year_avg_dividend_yield': five_year_avg_dividend_yield,
+        'current_assets': current_assets,
+        'current_liabilities': current_liabilities, 
+        'total_assets': total_assets,
+        'total_equity': total_equity,
+        'book_value_per_share': book_value_per_share
     }
     
 # Process financial data for a single ticker
@@ -312,6 +317,11 @@ def process_financial_data(ticker, data):
     current_price = data['current_price']
     dividend_yield = data['dividend_yield']
     dividend_rate = data['dividend_rate']
+    current_assets = data.get('current_assets')
+    current_liabilities = data.get('current_liabilities')
+    total_assets = data.get('total_assets')
+    total_equity = data.get('total_equity')
+    book_value_per_share = data.get('book_value_per_share')
     
     # Calculate Enterprise Value
     if market_cap is not None and total_debt is not None and cash is not None:
@@ -387,6 +397,54 @@ def process_financial_data(ticker, data):
             if current_price and current_price > 0:
                 graham_upside = ((graham_value / current_price) - 1) * 100
     
+    # 1. Calculate Price-to-Book Ratio (Graham Principle #1)
+    price_to_book = None
+    price_to_book_class = "secondary"  # Default color class
+    
+    if current_price and book_value_per_share and book_value_per_share > 0:
+        price_to_book = current_price / book_value_per_share
+        # Color coding based on Graham's criteria: <1.5 is good value
+        if price_to_book < 1.0:
+            price_to_book_class = "success"  # Green - Excellent value
+        elif price_to_book < 1.5:
+            price_to_book_class = "primary"  # Blue - Good value
+        elif price_to_book < 2.5:
+            price_to_book_class = "warning"  # Yellow - Fair value
+        else:
+            price_to_book_class = "danger"   # Red - Poor value
+    
+    # 2. Calculate Current Ratio (Graham Principle #2)
+    current_ratio = None
+    current_ratio_class = "secondary"  # Default color class
+    
+    if current_assets and current_liabilities and current_liabilities > 0:
+        current_ratio = current_assets / current_liabilities
+        # Color coding based on Graham's criteria: >2 is excellent, >1.5 is good
+        if current_ratio > 2.0:
+            current_ratio_class = "success"  # Green - Excellent financial health
+        elif current_ratio > 1.5:
+            current_ratio_class = "primary"  # Blue - Good financial health
+        elif current_ratio > 1.0:
+            current_ratio_class = "warning"  # Yellow - Adequate financial health
+        else:
+            current_ratio_class = "danger"   # Red - Poor financial health
+    
+    # 3. Calculate Debt-to-Equity Ratio (Graham Principle #3)
+    debt_to_equity = None
+    debt_to_equity_class = "secondary"  # Default color class
+    
+    if total_debt is not None and total_equity is not None and total_equity > 0:
+        debt_to_equity = total_debt / total_equity
+        # Color coding based on Graham's criteria: <0.5 is excellent, <1.0 is good
+        if debt_to_equity < 0.3:
+            debt_to_equity_class = "success"  # Green - Low leverage, excellent
+        elif debt_to_equity < 0.5:
+            debt_to_equity_class = "primary"  # Blue - Moderate leverage, good
+        elif debt_to_equity < 1.0:
+            debt_to_equity_class = "warning"  # Yellow - Higher leverage, acceptable
+        else:
+            debt_to_equity_class = "danger"   # Red - High leverage, poor
+    
     # Make a Buy/Not Buy Decision based on Earnings Yield and Return on Capital
     if earnings_yield is not None and return_on_capital is not None:
         if earnings_yield > 40 and return_on_capital > 40:
@@ -418,6 +476,11 @@ def process_financial_data(ticker, data):
     formatted_graham_value = format_currency(graham_value, currency) if graham_value is not None else "N/A"
     formatted_graham_upside = f"{graham_upside:.1f}%" if graham_upside is not None else "N/A"
     
+    # Format the Graham principle metrics
+    formatted_price_to_book = f"{price_to_book:.2f}" if price_to_book is not None else "N/A"
+    formatted_current_ratio = f"{current_ratio:.2f}" if current_ratio is not None else "N/A"
+    formatted_debt_to_equity = f"{debt_to_equity:.2f}" if debt_to_equity is not None else "N/A"
+    
     # Create a simplified result object for batch processing
     result = {
         'ticker': ticker,
@@ -440,6 +503,20 @@ def process_financial_data(ticker, data):
         'formatted_graham_value': formatted_graham_value,
         'graham_upside': graham_upside,
         'formatted_graham_upside': formatted_graham_upside,
+        
+        # Add Graham's principles metrics
+        'price_to_book': price_to_book,
+        'formatted_price_to_book': formatted_price_to_book,
+        'price_to_book_class': price_to_book_class,
+        
+        'current_ratio': current_ratio,
+        'formatted_current_ratio': formatted_current_ratio,
+        'current_ratio_class': current_ratio_class,
+        
+        'debt_to_equity': debt_to_equity,
+        'formatted_debt_to_equity': formatted_debt_to_equity,
+        'debt_to_equity_class': debt_to_equity_class,
+        
         'buy_decision': buy_decision,
         'decision_class': decision_class
     }
