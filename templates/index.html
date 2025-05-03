@@ -58,13 +58,20 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Industry:</strong> {{ result.industry }}</p>
-                            <p><strong>Sector:</strong> {{ result.sector }}</p>
-                            <p><strong>Country:</strong> {{ result.country }}</p>
-                            <p class="mb-0"><strong>Market Cap:</strong> {{ result.formatted_market_cap }}</p>
+                        <div class="col-md-4">
+                            <div class="card bg-dark mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Company Info</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Industry:</strong> {{ result.industry }}</p>
+                                    <p><strong>Sector:</strong> {{ result.sector }}</p>
+                                    <p><strong>Country:</strong> {{ result.country }}</p>
+                                    <p class="mb-0"><strong>Market Cap:</strong> {{ result.formatted_market_cap }}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="card bg-dark mb-3">
                                 <div class="card-header">
                                     <h5 class="mb-0">Dividend Information</h5>
@@ -76,13 +83,25 @@
                                     <p class="mb-0"><strong>5-Year Avg Yield:</strong> {{ result.formatted_five_year_avg_dividend_yield }}</p>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="card bg-dark mb-3">
                                 <div class="card-header">
                                     <h5 class="mb-0">Investment Decision</h5>
                                 </div>
                                 <div class="card-body text-center">
-                                    <div class="badge bg-{{ result.decision_class }} p-3 fs-5">{{ result.buy_decision }}</div>
-                                    <p class="mt-2 small text-muted">Based on Earnings Yield and Return on Capital</p>
+                                    <div class="badge bg-{{ result.decision_class }} p-3 fs-5 mb-2">{{ result.buy_decision }}</div>
+                                    <p class="small text-muted">Based on Earnings Yield and Return on Capital</p>
+                                    <div class="d-flex justify-content-between mt-3">
+                                        <div>
+                                            <strong>Earnings Yield:</strong><br>
+                                            {{ result.formatted_earnings_yield }}
+                                        </div>
+                                        <div>
+                                            <strong>Return on Capital:</strong><br>
+                                            {{ result.formatted_return_on_capital }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -148,18 +167,32 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="ratio-card mb-3">
                                 <h5>Earnings Yield</h5>
                                 <div class="ratio-value">{{ result.formatted_earnings_yield }}</div>
                                 <p class="text-muted small">EBIT / Enterprise Value</p>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="ratio-card mb-3">
                                 <h5>Return on Capital</h5>
                                 <div class="ratio-value">{{ result.formatted_return_on_capital }}</div>
                                 <p class="text-muted small">EBIT / Invested Capital</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>Dividend Yield</h5>
+                                <div class="ratio-value">{{ result.formatted_dividend_yield }}</div>
+                                <p class="text-muted small">Current yield based on price</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>Investing Decision</h5>
+                                <div class="ratio-value badge bg-{{ result.decision_class }}">{{ result.buy_decision }}</div>
+                                <p class="text-muted small">Based on financial metrics</p>
                             </div>
                         </div>
                     </div>
