@@ -311,14 +311,69 @@ def format_currency(value, currency='USD'):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     result = None
+    batch_results = None
     error_message = None
     
+    # Handle both POST and GET requests for single stock analysis
     if request.method == 'POST':
-        ticker = request.form.get('ticker', '').strip().upper()
+        action = request.form.get('action', 'single')
+        
+        if action == 'single':
+            ticker = request.form.get('ticker', '').strip().upper()
+            
+            if ticker:
+                logger.info(f"Processing request for ticker: {ticker}")
+                data = fetch_financial_data(ticker)
+        
+        elif action == 'batch':
+            ticker_list = request.form.get('ticker_list', '')
+            if ticker_list:
+                # Split the input by commas, spaces, and newlines
+                tickers = re.split(r'[,\s\n]+', ticker_list)
+                tickers = [t.strip().upper() for t in tickers if t.strip()]
+                
+                if tickers:
+                    logger.info(f"Processing batch request for {len(tickers)} tickers")
+                    batch_results = []
+                    
+                    for ticker in tickers:
+                        # Add delay to avoid API rate limits
+                        time.sleep(0.5 + random.random())
+                        
+                        logger.info(f"Processing ticker: {ticker}")
+                        try:
+                            data = fetch_financial_data(ticker)
+                            
+                            if 'error' in data:
+                                # Skip tickers with errors
+                                logger.error(f"Error retrieving data for {ticker}: {data['error']}")
+                                continue
+                            
+                            # Create simplified result object with key metrics
+                            ticker_result = process_financial_data(ticker, data)
+                            if ticker_result:
+                                batch_results.append(ticker_result)
+                                
+                        except Exception as e:
+                            logger.error(f"Error processing {ticker}: {str(e)}")
+                    
+                    if not batch_results:
+                        error_message = "Could not retrieve valid data for any of the provided tickers."
+                    
+                    # Return early with batch results
+                    return render_template('index.html', batch_results=batch_results, error_message=error_message)
+    
+    # Handle GET request with ticker parameter
+    elif request.method == 'GET' and request.args.get('ticker'):
+        ticker = request.args.get('ticker', '').strip().upper()
         
         if ticker:
-            logger.info(f"Processing request for ticker: {ticker}")
+            logger.info(f"Processing GET request for ticker: {ticker}")
             data = fetch_financial_data(ticker)
+    
+    # Regular single ticker processing
+    if request.method in ['POST', 'GET'] and not batch_results and 'ticker' in locals():
+        if ticker:
 
             if 'error' in data:
                 error_message = f"Error retrieving data for {ticker}: {data['error']}"
