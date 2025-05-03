@@ -97,39 +97,27 @@ def fetch_financial_data(ticker):
                 
             if not use_sample_data:
                 try:
-                    # Use quarterly financials instead of annual
-                    financials = stock.quarterly_financials.T
-                    logger.debug(f"Retrieved quarterly financials data for {ticker}")
+                    # Use annual financials
+                    financials = stock.financials.T
+                    logger.debug(f"Retrieved annual financials data for {ticker}")
                 except Exception as e:
-                    logger.error(f"Error fetching quarterly financials for {ticker}: {str(e)}")
-                    # Fall back to annual data if quarterly not available
-                    try:
-                        financials = stock.financials.T
-                        logger.debug(f"Falling back to annual financials data for {ticker}")
-                    except Exception as e2:
-                        logger.error(f"Error fetching annual financials for {ticker}: {str(e2)}")
-                        if "Too Many Requests" in str(e) and ticker.upper() in SAMPLE_DATA:
-                            use_sample_data = True
-                            logger.warning(f"Using sample data for {ticker} due to rate limiting")
-                        financials = pd.DataFrame()
+                    logger.error(f"Error fetching financials for {ticker}: {str(e)}")
+                    if "Too Many Requests" in str(e) and ticker.upper() in SAMPLE_DATA:
+                        use_sample_data = True
+                        logger.warning(f"Using sample data for {ticker} due to rate limiting")
+                    financials = pd.DataFrame()
                     
             if not use_sample_data:
                 try:
-                    # Use quarterly balance sheet instead of annual
-                    balance_sheet = stock.quarterly_balance_sheet.T
-                    logger.debug(f"Retrieved quarterly balance sheet data for {ticker}")
+                    # Use annual balance sheet
+                    balance_sheet = stock.balance_sheet.T
+                    logger.debug(f"Retrieved annual balance sheet data for {ticker}")
                 except Exception as e:
-                    logger.error(f"Error fetching quarterly balance sheet for {ticker}: {str(e)}")
-                    # Fall back to annual data if quarterly not available
-                    try:
-                        balance_sheet = stock.balance_sheet.T
-                        logger.debug(f"Falling back to annual balance sheet data for {ticker}")
-                    except Exception as e2:
-                        logger.error(f"Error fetching annual balance sheet for {ticker}: {str(e2)}")
-                        if "Too Many Requests" in str(e) and ticker.upper() in SAMPLE_DATA:
-                            use_sample_data = True
-                            logger.warning(f"Using sample data for {ticker} due to rate limiting")
-                        balance_sheet = pd.DataFrame()
+                    logger.error(f"Error fetching balance sheet for {ticker}: {str(e)}")
+                    if "Too Many Requests" in str(e) and ticker.upper() in SAMPLE_DATA:
+                        use_sample_data = True
+                        logger.warning(f"Using sample data for {ticker} due to rate limiting")
+                    balance_sheet = pd.DataFrame()
             
             # Fetch dividend information
             if not use_sample_data:
@@ -156,41 +144,17 @@ def fetch_financial_data(ticker):
                 market_cap = info.get('marketCap', None)
                 logger.debug(f"Market Cap: {market_cap}")
 
-                # EBIT (Operating Income) - try using TTM data first for most current figures
+                # EBIT (Operating Income)
                 ebit = None
-                try:
-                    # Get trailing twelve months (TTM) data if available
-                    ttm_financials = stock.ttm_financials
-                    if not ttm_financials.empty:
-                        ebit = ttm_financials.get('Total Operating Income As Reported', None)
-                        if ebit is None:
-                            ebit = ttm_financials.get('Operating Income', None)
-                        if ebit is not None:
-                            logger.debug(f"Retrieved EBIT from TTM: {ebit}")
-                except Exception as e:
-                    logger.warning(f"Couldn't get TTM financials for {ticker}: {str(e)}")
-                
-                # Fall back to quarterly/annual data if TTM not available
-                if ebit is None and not financials.empty:
+                if not financials.empty:
                     ebit = financials.get('Total Operating Income As Reported', [None])[0]
                     if ebit is None:
                         ebit = financials.get('Operating Income', [None])[0]
                 logger.debug(f"EBIT: {ebit}")
                 
-                # Debt (Total Debt) - try using TTM data first
+                # Debt (Total Debt)
                 total_debt = None
-                try:
-                    # Get trailing twelve months (TTM) data if available
-                    ttm_balance_sheet = stock.ttm_income_stmt  # This might contain some balance sheet items
-                    if not ttm_balance_sheet.empty:
-                        total_debt = ttm_balance_sheet.get('Total Debt', None)
-                        if total_debt is not None:
-                            logger.debug(f"Retrieved Total Debt from TTM: {total_debt}")
-                except Exception as e:
-                    logger.warning(f"Couldn't get TTM balance sheet for {ticker}: {str(e)}")
-                
-                # Fall back to quarterly/annual data if TTM not available
-                if total_debt is None and not balance_sheet.empty:
+                if not balance_sheet.empty:
                     total_debt = balance_sheet.get('Total Debt', [None])[0]
                     if total_debt is None:
                         # Try to compute from short-term and long-term debt
@@ -199,20 +163,9 @@ def fetch_financial_data(ticker):
                         total_debt = short_term_debt + long_term_debt
                 logger.debug(f"Total Debt: {total_debt}")
                 
-                # Cash (Cash and Cash Equivalents) - try using TTM data first
+                # Cash (Cash and Cash Equivalents)
                 cash = None
-                try:
-                    # Fast info often has very current cash data
-                    fast_info = stock.fast_info
-                    if hasattr(fast_info, 'cash'):
-                        cash = fast_info.cash
-                        if cash is not None:
-                            logger.debug(f"Retrieved Cash from fast_info: {cash}")
-                except Exception as e:
-                    logger.warning(f"Couldn't get fast_info cash for {ticker}: {str(e)}")
-                
-                # Fall back to quarterly/annual data if fast_info not available
-                if cash is None and not balance_sheet.empty:
+                if not balance_sheet.empty:
                     cash = balance_sheet.get('Cash And Cash Equivalents', [None])[0]
                     if cash is None:
                         cash = balance_sheet.get('Cash', [None])[0]
@@ -222,29 +175,14 @@ def fetch_financial_data(ticker):
                 current_assets = None
                 current_liabilities = None
                 
-                # Try TTM data first
-                try:
-                    ttm_balance_sheet = stock.ttm_incomestmt
-                    if not ttm_balance_sheet.empty:
-                        current_assets = ttm_balance_sheet.get('Total Current Assets', None)
-                        current_liabilities = ttm_balance_sheet.get('Total Current Liabilities', None)
-                        if current_assets is not None and current_liabilities is not None:
-                            logger.debug(f"Retrieved current assets and liabilities from TTM")
-                except Exception as e:
-                    logger.warning(f"Couldn't get TTM current assets/liabilities for {ticker}: {str(e)}")
-                
-                # Fall back to quarterly/annual balance sheet
-                if current_assets is None or current_liabilities is None:
-                    if not balance_sheet.empty:
-                        if current_assets is None:
-                            current_assets = balance_sheet.get('Total Current Assets', [None])[0]
-                            if not current_assets:
-                                current_assets = balance_sheet.get('Current Assets', [None])[0]
-                        
-                        if current_liabilities is None:
-                            current_liabilities = balance_sheet.get('Total Current Liabilities', [None])[0]
-                            if not current_liabilities:
-                                current_liabilities = balance_sheet.get('Current Liabilities', [None])[0]
+                if not balance_sheet.empty:
+                    current_assets = balance_sheet.get('Total Current Assets', [None])[0]
+                    if not current_assets:
+                        current_assets = balance_sheet.get('Current Assets', [None])[0]
+                    
+                    current_liabilities = balance_sheet.get('Total Current Liabilities', [None])[0]
+                    if not current_liabilities:
+                        current_liabilities = balance_sheet.get('Current Liabilities', [None])[0]
                 
                 logger.debug(f"Total Current Assets: {current_assets}")
                 logger.debug(f"Total Current Liabilities: {current_liabilities}")
