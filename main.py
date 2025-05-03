@@ -425,7 +425,7 @@ def index():
                 
                 if tickers:
                     # Limit the number of tickers to process to avoid timeouts
-                    MAX_TICKERS = 5
+                    MAX_TICKERS = 15
                     if len(tickers) > MAX_TICKERS:
                         tickers = tickers[:MAX_TICKERS]
                         warning_message = f"Processing only the first {MAX_TICKERS} tickers to avoid timeout. Please process the rest in another batch."
