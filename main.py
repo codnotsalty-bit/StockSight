@@ -355,7 +355,7 @@ def process_financial_data(ticker, data):
         if earnings_yield > 40 and return_on_capital > 40:
             buy_decision = "Not Buy"  # Too good to be true - potential trap
             decision_class = "danger"
-        elif (earnings_yield > 8 and return_on_capital > 12) or magic_score > 15:
+        elif earnings_yield > 12 and return_on_capital > 15:
             buy_decision = "Strong Buy"
             decision_class = "success"
         elif earnings_yield > 4 and return_on_capital > 8:
