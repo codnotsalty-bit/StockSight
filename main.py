@@ -311,6 +311,7 @@ def process_financial_data(ticker, data):
     currency = data['currency']
     current_price = data['current_price']
     dividend_yield = data['dividend_yield']
+    dividend_rate = data['dividend_rate']
     
     # Calculate Enterprise Value
     if market_cap is not None and total_debt is not None and cash is not None:
@@ -375,6 +376,7 @@ def process_financial_data(ticker, data):
     formatted_earnings_yield = f"{earnings_yield:.2f}%" if earnings_yield is not None else "N/A"
     formatted_return_on_capital = f"{return_on_capital:.2f}%" if return_on_capital is not None else "N/A"
     formatted_dividend_yield = f"{dividend_yield:.2f}%" if dividend_yield is not None else "N/A"
+    formatted_dividend_rate = format_currency(dividend_rate, currency) if dividend_rate is not None else "N/A"
     
     # Create a simplified result object for batch processing
     result = {
@@ -388,6 +390,8 @@ def process_financial_data(ticker, data):
         'formatted_return_on_capital': formatted_return_on_capital,
         'dividend_yield': dividend_yield,
         'formatted_dividend_yield': formatted_dividend_yield,
+        'dividend_rate': dividend_rate,
+        'formatted_dividend_rate': formatted_dividend_rate,
         'magic_score': magic_score,
         'formatted_magic_score': f"{magic_score:.1f}" if magic_score is not None else "N/A",
         'buy_decision': buy_decision,
