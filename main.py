@@ -580,6 +580,7 @@ def format_currency(value, currency='USD'):
 
 # Route to display the results
 @app.route('/', methods=['GET', 'POST'])
+@app.route('/stock', methods=['GET'])
 def index():
     batch_results = None
     error_message = None
