@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Stock Analysis Tool{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark">
+                <h2 class="card-title mb-0">Stock Analysis Tool</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">Enter a stock ticker to analyze key financial metrics including dividend information.</p>
+                
+                <form method="post" id="stockForm">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="Enter stock ticker (e.g., AAPL)" name="ticker" id="ticker" required>
+                        <button class="btn btn-primary" type="submit" id="submitBtn">
+                            <i class="fas fa-search me-1"></i> Analyze
+                        </button>
+                    </div>
+                    <div class="form-text">Try some examples: AAPL, MSFT, GOOGL, AMZN</div>
+                </form>
+                
+                <div id="loading" class="text-center my-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Fetching financial data...</p>
+                </div>
+                
+                {% if error_message %}
+                <div class="alert alert-danger mt-3" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i> {{ error_message }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if result %}
+        <div id="results" class="mb-4">
+            <!-- Company Information Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">{{ result.company_name }} ({{ result.ticker }})</h3>
+                    <span class="badge 
+                        {% if result.price_change > 0 %}bg-success{% elif result.price_change < 0 %}bg-danger{% else %}bg-secondary{% endif %}">
+                        {{ result.formatted_current_price }}
+                        {% if result.price_change != None %}
+                            {% if result.price_change > 0 %}
+                                <i class="fas fa-arrow-up ms-1"></i>
+                            {% elif result.price_change < 0 %}
+                                <i class="fas fa-arrow-down ms-1"></i>
+                            {% endif %}
+                            {{ result.formatted_price_change_percent }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Industry:</strong> {{ result.industry }}</p>
+                            <p><strong>Sector:</strong> {{ result.sector }}</p>
+                            <p><strong>Country:</strong> {{ result.country }}</p>
+                            <p class="mb-0"><strong>Market Cap:</strong> {{ result.formatted_market_cap }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-dark mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Dividend Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Dividend Rate:</strong> {{ result.formatted_dividend_rate }}</p>
+                                    <p><strong>Dividend Yield:</strong> {{ result.formatted_dividend_yield }}</p>
+                                    <p><strong>Ex-Dividend Date:</strong> {{ result.ex_dividend_date if result.ex_dividend_date else 'N/A' }}</p>
+                                    <p class="mb-0"><strong>5-Year Avg Yield:</strong> {{ result.formatted_five_year_avg_dividend_yield }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Financial Metrics Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Key Financial Metrics</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>Enterprise Value</th>
+                                        <td>{{ result.formatted_enterprise_value }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>EBIT</th>
+                                        <td>{{ result.formatted_ebit }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Debt</th>
+                                        <td>{{ result.formatted_total_debt }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Cash</th>
+                                        <td>{{ result.formatted_cash }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>Net Working Capital</th>
+                                        <td>{{ result.formatted_nwc }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Net Fixed Assets</th>
+                                        <td>{{ result.formatted_net_fixed_assets }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Invested Capital</th>
+                                        <td>{{ result.formatted_invested_capital }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Key Ratios Chart Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Key Ratios</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="ratio-card mb-3">
+                                <h5>Earnings Yield</h5>
+                                <div class="ratio-value">{{ result.formatted_earnings_yield }}</div>
+                                <p class="text-muted small">EBIT / Enterprise Value</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="ratio-card mb-3">
+                                <h5>Return on Capital</h5>
+                                <div class="ratio-value">{{ result.formatted_return_on_capital }}</div>
+                                <p class="text-muted small">EBIT / Invested Capital</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="ratiosChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Capital Structure Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Capital Structure</h4>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="capitalStructureChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // Store the result data for charts
+            const resultData = {
+                ticker: "{{ result.ticker }}",
+                earningsYield: {{ result.earnings_yield if result.earnings_yield is not none else 'null' }},
+                returnOnCapital: {{ result.return_on_capital if result.return_on_capital is not none else 'null' }},
+                marketCap: {{ result.market_cap if result.market_cap is not none else 'null' }},
+                totalDebt: {{ result.total_debt if result.total_debt is not none else 'null' }},
+                cash: {{ result.cash if result.cash is not none else 'null' }},
+                dividendYield: {{ result.dividend_yield if result.dividend_yield is not none else 'null' }},
+                fiveYearAvgDividendYield: {{ result.five_year_avg_dividend_yield if result.five_year_avg_dividend_yield is not none else 'null' }}
+            };
+        </script>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if result %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endif %}
+{% endblock %}
