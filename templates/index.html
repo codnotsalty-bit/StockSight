@@ -171,7 +171,7 @@
                                         {% if item.magic_rank is defined and item.magic_rank <= 3 %}
                                             <span class="badge bg-warning text-dark me-1">#{{ item.magic_rank }}</span>
                                         {% endif %}
-                                        <a href="/?ticker={{ item.ticker }}&action=single" class="fw-bold">{{ item.ticker }}</a>
+                                        <a href="https://finance.yahoo.com/quote/{{ item.ticker }}" target="_blank" class="fw-bold">{{ item.ticker }}</a>
                                     </td>
                                     <td>{{ item.company_name }}</td>
                                     <td>{{ item.formatted_current_price }}</td>

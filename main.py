@@ -464,22 +464,15 @@ def format_currency(value, currency='USD'):
 # Route to display the results
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    result = None
     batch_results = None
     error_message = None
+    warning_message = None
     
-    # Handle both POST and GET requests for single stock analysis
+    # Handle POST requests for batch analysis
     if request.method == 'POST':
-        action = request.form.get('action', 'single')
+        action = request.form.get('action', 'batch')
         
-        if action == 'single':
-            ticker = request.form.get('ticker', '').strip().upper()
-            
-            if ticker:
-                logger.info(f"Processing request for ticker: {ticker}")
-                data = fetch_financial_data(ticker)
-        
-        elif action == 'batch':
+        if action == 'batch':
             ticker_list = request.form.get('ticker_list', '')
             if ticker_list:
                 # Split the input by commas, spaces, and newlines
@@ -561,136 +554,8 @@ def index():
                                           error_message=error_message,
                                           warning_message=warning_message)
     
-    # Handle GET request with ticker parameter
-    elif request.method == 'GET' and request.args.get('ticker'):
-        ticker = request.args.get('ticker', '').strip().upper()
-        
-        if ticker:
-            logger.info(f"Processing GET request for ticker: {ticker}")
-            data = fetch_financial_data(ticker)
-    
-    # Regular single ticker processing
-    if request.method in ['POST', 'GET'] and not batch_results and 'ticker' in locals():
-        if ticker:
-
-            if 'error' in data:
-                error_message = f"Error retrieving data for {ticker}: {data['error']}"
-                logger.error(error_message)
-            else:
-                # Use our common process_financial_data function to do all calculations
-                # This ensures batch results and individual stock view use the same logic
-                result = process_financial_data(ticker, data)
-                
-                # Extract variables for the rest of the function
-                ebit = data['ebit']
-                market_cap = data['market_cap']
-                total_debt = data['total_debt']
-                cash = data['cash']
-                nwc = data['nwc']
-                net_fixed_assets = data['net_fixed_assets']
-                balance_sheet = data['balance_sheet']
-                company_name = data['company_name']
-                currency = data['currency']
-                
-                # Get calculated values from result
-                enterprise_value = market_cap + total_debt - cash if market_cap is not None and total_debt is not None and cash is not None else None
-                
-                # Handle missing Net Fixed Assets
-                if not net_fixed_assets and balance_sheet is not None:
-                    net_fixed_assets = balance_sheet.get('Total Assets', [None])[0]
-                
-                # Calculate Return on Capital
-                if net_fixed_assets and nwc:
-                    invested_capital = net_fixed_assets + nwc
-                elif net_fixed_assets:
-                    invested_capital = net_fixed_assets
-                elif nwc:
-                    invested_capital = nwc
-                else:
-                    invested_capital = None
-                
-                # Get decision values from result
-                earnings_yield = result['earnings_yield'] 
-                return_on_capital = result['return_on_capital']
-                buy_decision = result['buy_decision']
-                decision_class = result['decision_class']
-                
-                # Format values for display
-                formatted_market_cap = format_currency(market_cap, currency)
-                formatted_total_debt = format_currency(total_debt, currency)
-                formatted_cash = format_currency(cash, currency)
-                formatted_enterprise_value = format_currency(enterprise_value, currency)
-                formatted_ebit = format_currency(ebit, currency)
-                formatted_nwc = format_currency(nwc, currency)
-                formatted_net_fixed_assets = format_currency(net_fixed_assets, currency)
-                formatted_invested_capital = format_currency(invested_capital, currency)
-                formatted_current_price = format_currency(data['current_price'], currency)
-                formatted_price_change = format_currency(data['price_change'], currency)
-                
-                # Create result object
-                result = {
-                    'ticker': ticker,
-                    'company_name': company_name,
-                    'industry': data['industry'],
-                    'sector': data['sector'],
-                    'country': data['country'],
-                    
-                    'market_cap': market_cap,
-                    'formatted_market_cap': formatted_market_cap,
-                    
-                    'total_debt': total_debt,
-                    'formatted_total_debt': formatted_total_debt,
-                    
-                    'cash': cash,
-                    'formatted_cash': formatted_cash,
-                    
-                    'enterprise_value': enterprise_value,
-                    'formatted_enterprise_value': formatted_enterprise_value,
-                    
-                    'ebit': ebit,
-                    'formatted_ebit': formatted_ebit,
-                    
-                    'earnings_yield': earnings_yield,
-                    'formatted_earnings_yield': f"{earnings_yield:.2f}%" if earnings_yield is not None else "N/A",
-                    
-                    'nwc': nwc,
-                    'formatted_nwc': formatted_nwc,
-                    
-                    'net_fixed_assets': net_fixed_assets,
-                    'formatted_net_fixed_assets': formatted_net_fixed_assets,
-                    
-                    'invested_capital': invested_capital,
-                    'formatted_invested_capital': formatted_invested_capital,
-                    
-                    'return_on_capital': return_on_capital,
-                    'formatted_return_on_capital': f"{return_on_capital:.2f}%" if return_on_capital is not None else "N/A",
-                    
-                    'current_price': data['current_price'],
-                    'formatted_current_price': formatted_current_price,
-                    
-                    'price_change': data['price_change'],
-                    'formatted_price_change': formatted_price_change,
-                    
-                    'price_change_percent': data['price_change_percent'],
-                    'formatted_price_change_percent': f"{data['price_change_percent']:.2f}%" if data['price_change_percent'] is not None else "N/A",
-                    
-                    'dividend_rate': data['dividend_rate'],
-                    'formatted_dividend_rate': format_currency(data['dividend_rate'], currency) if data['dividend_rate'] is not None else "N/A",
-                    
-                    'dividend_yield': data['dividend_yield'],
-                    'formatted_dividend_yield': f"{data['dividend_yield']:.2f}%" if data['dividend_yield'] is not None else "N/A",
-                    
-                    'ex_dividend_date': data['ex_dividend_date'],
-                    'five_year_avg_dividend_yield': data['five_year_avg_dividend_yield'],
-                    'formatted_five_year_avg_dividend_yield': f"{data['five_year_avg_dividend_yield']:.2f}%" if data['five_year_avg_dividend_yield'] is not None else "N/A",
-                    
-                    'currency': currency,
-                    
-                    'buy_decision': buy_decision,
-                    'decision_class': decision_class
-                }
-    
-    return render_template('index.html', result=result, error_message=error_message)
+    # Default view - just show the form
+    return render_template('index.html', error_message=error_message)
 
 @app.route('/api/stock/<ticker>', methods=['GET'])
 def get_stock_data(ticker):
