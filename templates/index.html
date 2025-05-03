@@ -134,7 +134,13 @@
                                     <h5>Batch Information</h5>
                                     <p><strong>Total Tickers Analyzed:</strong> {{ batch_results|length }}</p>
                                     <p><strong>Companies with Good Dividend Yield (>2%):</strong> 
-                                        {{ batch_results|selectattr('dividend_yield', 'defined')|selectattr('dividend_yield', 'ge', 2)|list|length }}
+                                        {% set dividend_count = 0 %}
+                                        {% for item in batch_results %}
+                                            {% if item.dividend_yield is defined and item.dividend_yield is not none and item.dividend_yield > 2 %}
+                                                {% set dividend_count = dividend_count + 1 %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {{ dividend_count }}
                                     </p>
                                     <p class="mb-0"><strong>Investment Rating:</strong> 
                                         {% set good_investments = batch_results|selectattr('buy_decision', 'in', ['Buy', 'Strong Buy'])|list|length %}
