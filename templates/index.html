@@ -76,6 +76,15 @@
                                     <p class="mb-0"><strong>5-Year Avg Yield:</strong> {{ result.formatted_five_year_avg_dividend_yield }}</p>
                                 </div>
                             </div>
+                            <div class="card bg-dark mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Investment Decision</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="badge bg-{{ result.decision_class }} p-3 fs-5">{{ result.buy_decision }}</div>
+                                    <p class="mt-2 small text-muted">Based on Earnings Yield and Return on Capital</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

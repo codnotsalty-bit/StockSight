@@ -24,10 +24,10 @@ function createRatiosChart() {
                 resultData.fiveYearAvgDividendYield
             ],
             backgroundColor: [
-                'rgba(75, 192, 192, 0.6)',
-                'rgba(54, 162, 235, 0.6)',
-                'rgba(255, 206, 86, 0.6)',
-                'rgba(255, 159, 64, 0.6)'
+                'rgba(75, 192, 192, 0.6)',  // Earnings Yield
+                'rgba(54, 162, 235, 0.6)',  // Return on Capital
+                'rgba(255, 206, 86, 0.6)',  // Dividend Yield
+                'rgba(255, 159, 64, 0.6)'   // 5-Year Avg Dividend Yield
             ],
             borderColor: [
                 'rgba(75, 192, 192, 1)',

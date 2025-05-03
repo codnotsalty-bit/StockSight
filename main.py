@@ -364,6 +364,27 @@ def index():
                     return_on_capital = (ebit / invested_capital) * 100
                 else:
                     return_on_capital = None
+
+                # Make a Buy/Not Buy Decision based on Earnings Yield and Return on Capital
+                if earnings_yield is not None and return_on_capital is not None:
+                    if earnings_yield > 40 and return_on_capital > 40:
+                        buy_decision = "Not Buy"
+                        decision_class = "danger"
+                    elif (earnings_yield > 10 and return_on_capital > 15):
+                        buy_decision = "Strong Buy"
+                        decision_class = "success"
+                    elif earnings_yield > 5 and return_on_capital > 10:
+                        buy_decision = "Buy"
+                        decision_class = "primary"
+                    elif earnings_yield > 5 or return_on_capital > 10:
+                        buy_decision = "Hold"
+                        decision_class = "warning"
+                    else:
+                        buy_decision = "Not Buy"
+                        decision_class = "danger"
+                else:
+                    buy_decision = "Insufficient Data"
+                    decision_class = "secondary"
                 
                 # Format values for display
                 formatted_market_cap = format_currency(market_cap, currency)
@@ -434,7 +455,10 @@ def index():
                     'five_year_avg_dividend_yield': data['five_year_avg_dividend_yield'],
                     'formatted_five_year_avg_dividend_yield': f"{data['five_year_avg_dividend_yield']:.2f}%" if data['five_year_avg_dividend_yield'] is not None else "N/A",
                     
-                    'currency': currency
+                    'currency': currency,
+                    
+                    'buy_decision': buy_decision,
+                    'decision_class': decision_class
                 }
     
     return render_template('index.html', result=result, error_message=error_message)

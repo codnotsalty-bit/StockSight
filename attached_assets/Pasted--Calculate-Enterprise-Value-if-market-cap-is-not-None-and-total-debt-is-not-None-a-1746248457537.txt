@@ -1,0 +1,73 @@
+ # Calculate Enterprise Value
+                if market_cap is not None and total_debt is not None and cash is not None:
+                    enterprise_value = market_cap + total_debt - cash
+                else:
+                    enterprise_value = None
+                
+                # Calculate Earnings Yield
+                if enterprise_value and ebit is not None and enterprise_value != 0:
+                    earnings_yield = (ebit / enterprise_value) * 100
+                else:
+                    earnings_yield = None
+                
+                # Handle missing Net Fixed Assets
+                if not net_fixed_assets and balance_sheet is not None:
+                    net_fixed_assets = balance_sheet.get('Total Assets', [None])[0]
+                
+                # Calculate Return on Capital
+                if net_fixed_assets and nwc:
+                    invested_capital = net_fixed_assets + nwc
+                elif net_fixed_assets:
+                    invested_capital = net_fixed_assets
+                elif nwc:
+                    invested_capital = nwc
+                else:
+                    invested_capital = None
+                
+                if invested_capital and ebit is not None and invested_capital != 0:
+                    return_on_capital = (ebit / invested_capital) * 100
+                else:
+                    return_on_capital = None
+
+                # Make a Buy/Not Buy Decision based on Earnings Yield and Return on Capital
+                if earnings_yield is not None and return_on_capital is not None:
+                    if earnings_yield > 40 and return_on_capital > 40:
+                        buy_decision = "Not Buy"
+                        decision_class = "danger"
+                    elif (earnings_yield > 10 and return_on_capital > 15):
+                        buy_decision = "Strong Buy"
+                        decision_class = "success"
+                    elif earnings_yield > 5 and return_on_capital > 10:
+                        buy_decision = "Buy"
+                        decision_class = "primary"
+                    elif earnings_yield > 5 or return_on_capital > 10:
+                        buy_decision = "Hold"
+                        decision_class = "warning"
+                    else:
+                        buy_decision = "Not Buy"
+                        decision_class = "danger"
+                else:
+                    buy_decision = "Insufficient Data"
+                    decision_class = "secondary"
+                
+                # Format values for display
+                formatted_market_cap = format_currency(market_cap, currency)
+                formatted_ebit = format_currency(ebit, currency)
+                formatted_total_debt = format_currency(total_debt, currency)
+                formatted_cash = format_currency(cash, currency)
+                formatted_nwc = format_currency(nwc, currency)
+                formatted_enterprise_value = format_currency(enterprise_value, currency)
+                formatted_invested_capital = format_currency(invested_capital, currency)
+                
+                current_price = data['current_price']
+                price_change = data['price_change']
+                price_change_percent = data['price_change_percent']
+                
+                formatted_current_price = f"{currency} {current_price:.2f}" if current_price else "N/A"
+                
+                if price_change and price_change_percent:
+                    price_trend = "positive" if price_change > 0 else "negative"
+                    formatted_price_change = f"{'+' if price_change > 0 else ''}{price_change:.2f} ({'+' if price_change > 0 else ''}{price_change_percent:.2f}%)"
+                else:
+                    price_trend = "neutral"
+                    formatted_price_change = "N/A"
