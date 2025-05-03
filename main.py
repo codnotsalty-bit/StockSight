@@ -68,8 +68,8 @@ def fetch_financial_data(ticker):
     
     # Add rate limiting protection
     
-    # Random delay between 0.5 and 1.5 seconds to avoid rate limiting
-    delay = 0.5 + random.random()
+    # Small delay to avoid rate limiting (reduced to prevent timeout)
+    delay = 0.1 + random.random() * 0.2
     logger.debug(f"Adding delay of {delay:.2f} seconds before API request")
     time.sleep(delay)
     
@@ -424,12 +424,20 @@ def index():
                 tickers = [t.strip().upper() for t in tickers if t.strip()]
                 
                 if tickers:
+                    # Limit the number of tickers to process to avoid timeouts
+                    MAX_TICKERS = 5
+                    if len(tickers) > MAX_TICKERS:
+                        tickers = tickers[:MAX_TICKERS]
+                        warning_message = f"Processing only the first {MAX_TICKERS} tickers to avoid timeout. Please process the rest in another batch."
+                    else:
+                        warning_message = None
+                        
                     logger.info(f"Processing batch request for {len(tickers)} tickers")
                     batch_results = []
                     
                     for ticker in tickers:
-                        # Add delay to avoid API rate limits
-                        time.sleep(0.5 + random.random())
+                        # Short delay to avoid API rate limits
+                        time.sleep(0.1)
                         
                         logger.info(f"Processing ticker: {ticker}")
                         try:
@@ -452,7 +460,10 @@ def index():
                         error_message = "Could not retrieve valid data for any of the provided tickers."
                     
                     # Return early with batch results
-                    return render_template('index.html', batch_results=batch_results, error_message=error_message)
+                    return render_template('index.html', 
+                                          batch_results=batch_results, 
+                                          error_message=error_message,
+                                          warning_message=warning_message)
     
     # Handle GET request with ticker parameter
     elif request.method == 'GET' and request.args.get('ticker'):
