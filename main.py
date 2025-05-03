@@ -2,6 +2,7 @@ import os
 import logging
 import time
 import random
+import re
 import requests
 import pandas as pd
 import yfinance as yf
@@ -291,6 +292,96 @@ def fetch_financial_data(ticker):
         'ex_dividend_date': ex_dividend_date,
         'five_year_avg_dividend_yield': five_year_avg_dividend_yield
     }
+    
+# Process financial data for a single ticker
+def process_financial_data(ticker, data):
+    if 'error' in data:
+        return None
+    
+    # Extract all necessary data for calculations
+    market_cap = data['market_cap']
+    ebit = data['ebit']
+    total_debt = data['total_debt']
+    cash = data['cash']
+    nwc = data['nwc']
+    net_fixed_assets = data['net_fixed_assets']
+    company_name = data['company_name']
+    currency = data['currency']
+    current_price = data['current_price']
+    dividend_yield = data['dividend_yield']
+    
+    # Calculate Enterprise Value
+    if market_cap is not None and total_debt is not None and cash is not None:
+        enterprise_value = market_cap + total_debt - cash
+    else:
+        enterprise_value = None
+    
+    # Calculate Earnings Yield
+    if enterprise_value and ebit is not None and enterprise_value != 0:
+        earnings_yield = (ebit / enterprise_value) * 100
+    else:
+        earnings_yield = None
+    
+    # Calculate Invested Capital
+    if net_fixed_assets and nwc:
+        invested_capital = net_fixed_assets + nwc
+    elif net_fixed_assets:
+        invested_capital = net_fixed_assets
+    elif nwc:
+        invested_capital = nwc
+    else:
+        invested_capital = None
+    
+    # Calculate Return on Capital
+    if invested_capital and ebit is not None and invested_capital != 0:
+        return_on_capital = (ebit / invested_capital) * 100
+    else:
+        return_on_capital = None
+    
+    # Make a Buy/Not Buy Decision based on Earnings Yield and Return on Capital
+    if earnings_yield is not None and return_on_capital is not None:
+        if earnings_yield > 40 and return_on_capital > 40:
+            buy_decision = "Not Buy"
+            decision_class = "danger"
+        elif (earnings_yield > 10 and return_on_capital > 15):
+            buy_decision = "Strong Buy"
+            decision_class = "success"
+        elif earnings_yield > 5 and return_on_capital > 10:
+            buy_decision = "Buy"
+            decision_class = "primary"
+        elif earnings_yield > 5 or return_on_capital > 10:
+            buy_decision = "Hold"
+            decision_class = "warning"
+        else:
+            buy_decision = "Not Buy"
+            decision_class = "danger"
+    else:
+        buy_decision = "Insufficient Data"
+        decision_class = "secondary"
+    
+    # Format values for display
+    formatted_current_price = format_currency(current_price, currency)
+    formatted_earnings_yield = f"{earnings_yield:.2f}%" if earnings_yield is not None else "N/A"
+    formatted_return_on_capital = f"{return_on_capital:.2f}%" if return_on_capital is not None else "N/A"
+    formatted_dividend_yield = f"{dividend_yield:.2f}%" if dividend_yield is not None else "N/A"
+    
+    # Create a simplified result object for batch processing
+    result = {
+        'ticker': ticker,
+        'company_name': company_name,
+        'current_price': current_price,
+        'formatted_current_price': formatted_current_price,
+        'earnings_yield': earnings_yield,
+        'formatted_earnings_yield': formatted_earnings_yield,
+        'return_on_capital': return_on_capital,
+        'formatted_return_on_capital': formatted_return_on_capital,
+        'dividend_yield': dividend_yield,
+        'formatted_dividend_yield': formatted_dividend_yield,
+        'buy_decision': buy_decision,
+        'decision_class': decision_class
+    }
+    
+    return result
 
 # Helper function to format currency values
 def format_currency(value, currency='USD'):
