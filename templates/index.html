@@ -157,7 +157,9 @@
                                     <th>Earnings Yield</th>
                                     <th>Return on Capital</th>
                                     <th>Dividend Yield</th>
-                                    <th>Dividend Rate</th>
+                                    <th>P/B Ratio</th>
+                                    <th>Current Ratio</th>
+                                    <th>D/E Ratio</th>
                                     <th>Magic Score</th>
                                     <th>AlphaSpreads</th>
                                     <th>Graham Value</th>
@@ -192,7 +194,21 @@
                                             {{ item.formatted_dividend_yield }}
                                         </span>
                                     </td>
-                                    <td>{{ item.formatted_dividend_rate }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ item.price_to_book_class }}">
+                                            {{ item.formatted_price_to_book }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ item.current_ratio_class }}">
+                                            {{ item.formatted_current_ratio }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ item.debt_to_equity_class }}">
+                                            {{ item.formatted_debt_to_equity }}
+                                        </span>
+                                    </td>
                                     <td>
                                         <span class="{% if item.magic_rank is defined and item.magic_rank is not none %}{% if item.magic_rank <= 3 %}text-success fw-bold{% elif item.magic_rank <= 10 %}text-success{% elif item.magic_rank <= 20 %}text-info{% else %}text-muted{% endif %}{% else %}text-secondary{% endif %}">
                                             {{ item.formatted_magic_score }}
