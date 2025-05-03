@@ -35,7 +35,10 @@ SAMPLE_DATA = {
         "dividend_rate": 0.96,
         "dividend_yield": 0.55,
         "ex_dividend_date": "2023-08-11",
-        "five_year_avg_dividend_yield": 0.65
+        "five_year_avg_dividend_yield": 0.65,
+        "total_assets": 350000000000,
+        "total_equity": 180000000000,
+        "book_value_per_share": 11.50
     },
     "MSFT": {
         "market_cap": 2600000000000,
@@ -55,7 +58,10 @@ SAMPLE_DATA = {
         "dividend_rate": 3.00,
         "dividend_yield": 0.86,
         "ex_dividend_date": "2023-08-16",
-        "five_year_avg_dividend_yield": 0.92
+        "five_year_avg_dividend_yield": 0.92,
+        "total_assets": 390000000000,
+        "total_equity": 210000000000,
+        "book_value_per_share": 28.15
     }
 }
 
@@ -202,6 +208,35 @@ def fetch_financial_data(ticker):
                 
                 logger.debug(f"Net Fixed Assets (PP&E): {net_fixed_assets}")
                 
+                # Graham Principles Metrics - Get total assets and total equity
+                total_assets = None
+                total_equity = None
+                book_value_per_share = None
+                shares_outstanding = None
+                
+                if not balance_sheet.empty:
+                    # Try to get Total Assets
+                    total_assets = balance_sheet.get('Total Assets', [None])[0]
+                    logger.debug(f"Total Assets: {total_assets}")
+                    
+                    # Try to get Total Equity (Stockholders' Equity)
+                    total_equity = balance_sheet.get('Total Stockholder Equity', [None])[0]
+                    if total_equity is None:
+                        total_equity = balance_sheet.get('Stockholders Equity', [None])[0]
+                    if total_equity is None:
+                        total_equity = balance_sheet.get('Total Equity', [None])[0]
+                    logger.debug(f"Total Equity: {total_equity}")
+                
+                # Get shares outstanding for book value per share calculation
+                if info:
+                    shares_outstanding = info.get('sharesOutstanding', None)
+                    logger.debug(f"Shares Outstanding: {shares_outstanding}")
+                
+                # Calculate book value per share
+                if total_equity is not None and shares_outstanding is not None and shares_outstanding > 0:
+                    book_value_per_share = total_equity / shares_outstanding
+                    logger.debug(f"Book Value Per Share: {book_value_per_share}")
+                    
                 # Get company name and some additional info for display
                 company_name = info.get('shortName', ticker.upper())
                 industry = info.get('industry', 'N/A')
@@ -265,6 +300,11 @@ def fetch_financial_data(ticker):
         dividend_yield = data.get('dividend_yield', None)
         ex_dividend_date = data.get('ex_dividend_date', None)
         five_year_avg_dividend_yield = data.get('five_year_avg_dividend_yield', None)
+        
+        # Get Graham Principles metrics from sample data
+        total_assets = data.get('total_assets', None)
+        total_equity = data.get('total_equity', None)
+        book_value_per_share = data.get('book_value_per_share', None)
         
         # For sample data, we'll have a DataFrame-like structure for balance_sheet
         balance_sheet = None
