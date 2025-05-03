@@ -182,6 +182,7 @@
                                     <th>Dividend Yield</th>
                                     <th>Dividend Rate</th>
                                     <th>Magic Score</th>
+                                    <th>AlphaSpreads</th>
                                     <th>Graham Value</th>
                                     <th>Decision</th>
                                 </tr>
@@ -202,6 +203,7 @@
                                     <td>{{ item.formatted_dividend_yield }}</td>
                                     <td>{{ item.formatted_dividend_rate }}</td>
                                     <td>{{ item.formatted_magic_score }}</td>
+                                    <td>{{ item.formatted_alpha_score }}</td>
                                     <td>
                                         {{ item.formatted_graham_value }}
                                         {% if item.graham_upside is defined and item.graham_upside is not none %}
