@@ -199,25 +199,25 @@
                                     <td>{{ item.company_name }}</td>
                                     <td>{{ item.formatted_current_price }}</td>
                                     <td>
-                                        <span class="{% if item.earnings_yield >= 0.12 %}text-success{% elif item.earnings_yield >= 0.04 %}text-info{% else %}text-danger{% endif %}">
+                                        <span class="{% if item.earnings_yield is defined and item.earnings_yield is not none %}{% if item.earnings_yield >= 0.12 %}text-success{% elif item.earnings_yield >= 0.04 %}text-info{% else %}text-danger{% endif %}{% else %}text-secondary{% endif %}">
                                             {{ item.formatted_earnings_yield }}
                                         </span> 
                                         <small class="text-muted">(#{{ item.ey_rank }})</small>
                                     </td>
                                     <td>
-                                        <span class="{% if item.return_on_capital >= 0.15 %}text-success{% elif item.return_on_capital >= 0.08 %}text-info{% else %}text-danger{% endif %}">
+                                        <span class="{% if item.return_on_capital is defined and item.return_on_capital is not none %}{% if item.return_on_capital >= 0.15 %}text-success{% elif item.return_on_capital >= 0.08 %}text-info{% else %}text-danger{% endif %}{% else %}text-secondary{% endif %}">
                                             {{ item.formatted_return_on_capital }}
                                         </span>
                                         <small class="text-muted">(#{{ item.roc_rank }})</small>
                                     </td>
                                     <td>
-                                        <span class="{% if item.dividend_yield >= 0.04 %}text-success fw-bold{% elif item.dividend_yield >= 0.02 %}text-success{% elif item.dividend_yield > 0 %}text-muted{% else %}text-secondary{% endif %}">
+                                        <span class="{% if item.dividend_yield is defined and item.dividend_yield is not none %}{% if item.dividend_yield >= 0.04 %}text-success fw-bold{% elif item.dividend_yield >= 0.02 %}text-success{% elif item.dividend_yield > 0 %}text-muted{% else %}text-secondary{% endif %}{% else %}text-secondary{% endif %}">
                                             {{ item.formatted_dividend_yield }}
                                         </span>
                                     </td>
                                     <td>{{ item.formatted_dividend_rate }}</td>
                                     <td>
-                                        <span class="{% if item.magic_rank <= 3 %}text-success fw-bold{% elif item.magic_rank <= 10 %}text-success{% elif item.magic_rank <= 20 %}text-info{% else %}text-muted{% endif %}">
+                                        <span class="{% if item.magic_rank is defined and item.magic_rank is not none %}{% if item.magic_rank <= 3 %}text-success fw-bold{% elif item.magic_rank <= 10 %}text-success{% elif item.magic_rank <= 20 %}text-info{% else %}text-muted{% endif %}{% else %}text-secondary{% endif %}">
                                             {{ item.formatted_magic_score }}
                                         </span>
                                     </td>
