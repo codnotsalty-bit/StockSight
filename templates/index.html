@@ -16,15 +16,15 @@
                     <div class="mb-3">
                         <ul class="nav nav-tabs" id="analysisTabs" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="single-tab" data-bs-toggle="tab" data-bs-target="#single-analysis" type="button" role="tab">Single Stock</button>
+                                <button class="nav-link {% if not batch_results %}active{% endif %}" id="single-tab" data-bs-toggle="tab" data-bs-target="#single-analysis" type="button" role="tab">Single Stock</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="batch-tab" data-bs-toggle="tab" data-bs-target="#batch-analysis" type="button" role="tab">Multiple Stocks</button>
+                                <button class="nav-link {% if batch_results %}active{% endif %}" id="batch-tab" data-bs-toggle="tab" data-bs-target="#batch-analysis" type="button" role="tab">Multiple Stocks</button>
                             </li>
                         </ul>
                         
                         <div class="tab-content mt-3" id="analysisTabContent">
-                            <div class="tab-pane fade show active" id="single-analysis" role="tabpanel">
+                            <div class="tab-pane fade {% if not batch_results %}show active{% endif %}" id="single-analysis" role="tabpanel">
                                 <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Enter stock ticker (e.g., AAPL)" name="ticker" id="ticker">
                                     <button class="btn btn-primary" type="submit" id="submitBtn" name="action" value="single">
@@ -34,7 +34,7 @@
                                 <div class="form-text">Try some examples: AAPL, MSFT, GOOGL, AMZN</div>
                             </div>
                             
-                            <div class="tab-pane fade" id="batch-analysis" role="tabpanel">
+                            <div class="tab-pane fade {% if batch_results %}show active{% endif %}" id="batch-analysis" role="tabpanel">
                                 <div class="form-group">
                                     <textarea class="form-control" id="tickerList" name="ticker_list" rows="5" placeholder="Enter multiple tickers separated by commas, spaces, or new lines (e.g., AAPL, MSFT, GOOGL)"></textarea>
                                 </div>
@@ -182,8 +182,8 @@
                                     <th>Dividend Yield</th>
                                     <th>Dividend Rate</th>
                                     <th>Magic Score</th>
-                                    <th>AlphaSpreads</th>
-                                    <th>Graham Value</th>
+                                    <th class="bg-info bg-opacity-25">AlphaSpreads</th>
+                                    <th class="bg-success bg-opacity-25">Graham Value</th>
                                     <th>Decision</th>
                                 </tr>
                             </thead>
@@ -203,8 +203,8 @@
                                     <td>{{ item.formatted_dividend_yield }}</td>
                                     <td>{{ item.formatted_dividend_rate }}</td>
                                     <td>{{ item.formatted_magic_score }}</td>
-                                    <td>{{ item.formatted_alpha_score }}</td>
-                                    <td>
+                                    <td class="bg-info bg-opacity-10">{{ item.formatted_alpha_score }}</td>
+                                    <td class="bg-success bg-opacity-10">
                                         {{ item.formatted_graham_value }}
                                         {% if item.graham_upside is defined and item.graham_upside is not none %}
                                             <small class="{% if item.graham_upside > 0 %}text-success{% elif item.graham_upside < 0 %}text-danger{% endif %}">
