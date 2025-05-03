@@ -182,8 +182,8 @@
                                     <th>Dividend Yield</th>
                                     <th>Dividend Rate</th>
                                     <th>Magic Score</th>
-                                    <th class="bg-info bg-opacity-25">AlphaSpreads</th>
-                                    <th class="bg-success bg-opacity-25">Graham Value</th>
+                                    <th>AlphaSpreads</th>
+                                    <th>Graham Value</th>
                                     <th>Decision</th>
                                 </tr>
                             </thead>
@@ -198,18 +198,48 @@
                                     </td>
                                     <td>{{ item.company_name }}</td>
                                     <td>{{ item.formatted_current_price }}</td>
-                                    <td>{{ item.formatted_earnings_yield }} <small class="text-muted">(#{{ item.ey_rank }})</small></td>
-                                    <td>{{ item.formatted_return_on_capital }} <small class="text-muted">(#{{ item.roc_rank }})</small></td>
-                                    <td>{{ item.formatted_dividend_yield }}</td>
+                                    <td>
+                                        <span class="{% if item.earnings_yield >= 0.12 %}text-success{% elif item.earnings_yield >= 0.04 %}text-info{% else %}text-danger{% endif %}">
+                                            {{ item.formatted_earnings_yield }}
+                                        </span> 
+                                        <small class="text-muted">(#{{ item.ey_rank }})</small>
+                                    </td>
+                                    <td>
+                                        <span class="{% if item.return_on_capital >= 0.15 %}text-success{% elif item.return_on_capital >= 0.08 %}text-info{% else %}text-danger{% endif %}">
+                                            {{ item.formatted_return_on_capital }}
+                                        </span>
+                                        <small class="text-muted">(#{{ item.roc_rank }})</small>
+                                    </td>
+                                    <td>
+                                        <span class="{% if item.dividend_yield >= 0.04 %}text-success fw-bold{% elif item.dividend_yield >= 0.02 %}text-success{% elif item.dividend_yield > 0 %}text-muted{% else %}text-secondary{% endif %}">
+                                            {{ item.formatted_dividend_yield }}
+                                        </span>
+                                    </td>
                                     <td>{{ item.formatted_dividend_rate }}</td>
-                                    <td>{{ item.formatted_magic_score }}</td>
-                                    <td class="bg-info bg-opacity-10">{{ item.formatted_alpha_score }}</td>
-                                    <td class="bg-success bg-opacity-10">
-                                        {{ item.formatted_graham_value }}
+                                    <td>
+                                        <span class="{% if item.magic_rank <= 3 %}text-success fw-bold{% elif item.magic_rank <= 10 %}text-success{% elif item.magic_rank <= 20 %}text-info{% else %}text-muted{% endif %}">
+                                            {{ item.formatted_magic_score }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if item.alpha_score is defined and item.alpha_score is not none %}
+                                            <span class="{% if item.alpha_score >= 7 %}text-success{% elif item.alpha_score >= 5 %}text-info{% elif item.alpha_score >= 3 %}text-warning{% else %}text-danger{% endif %}">
+                                                {{ item.formatted_alpha_score }}
+                                            </span>
+                                        {% else %}
+                                            {{ item.formatted_alpha_score }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
                                         {% if item.graham_upside is defined and item.graham_upside is not none %}
-                                            <small class="{% if item.graham_upside > 0 %}text-success{% elif item.graham_upside < 0 %}text-danger{% endif %}">
-                                                ({{ item.formatted_graham_upside }})
-                                            </small>
+                                            <span class="{% if item.graham_upside > 20 %}text-success fw-bold{% elif item.graham_upside > 0 %}text-success{% elif item.graham_upside > -20 %}text-warning{% else %}text-danger{% endif %}">
+                                                {{ item.formatted_graham_value }}
+                                                <small class="{% if item.graham_upside > 0 %}text-success{% elif item.graham_upside < 0 %}text-danger{% endif %}">
+                                                    ({{ item.formatted_graham_upside }})
+                                                </small>
+                                            </span>
+                                        {% else %}
+                                            {{ item.formatted_graham_value }}
                                         {% endif %}
                                     </td>
                                     <td><span class="badge bg-{{ item.decision_class }}">{{ item.buy_decision }}</span></td>
