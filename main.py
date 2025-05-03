@@ -525,6 +525,11 @@ def index():
                 error_message = f"Error retrieving data for {ticker}: {data['error']}"
                 logger.error(error_message)
             else:
+                # Use our common process_financial_data function to do all calculations
+                # This ensures batch results and individual stock view use the same logic
+                result = process_financial_data(ticker, data)
+                
+                # Extract variables for the rest of the function
                 ebit = data['ebit']
                 market_cap = data['market_cap']
                 total_debt = data['total_debt']
@@ -535,17 +540,8 @@ def index():
                 company_name = data['company_name']
                 currency = data['currency']
                 
-                # Calculate Enterprise Value
-                if market_cap is not None and total_debt is not None and cash is not None:
-                    enterprise_value = market_cap + total_debt - cash
-                else:
-                    enterprise_value = None
-                
-                # Calculate Earnings Yield
-                if enterprise_value and ebit is not None and enterprise_value != 0:
-                    earnings_yield = (ebit / enterprise_value) * 100
-                else:
-                    earnings_yield = None
+                # Get calculated values from result
+                enterprise_value = market_cap + total_debt - cash if market_cap is not None and total_debt is not None and cash is not None else None
                 
                 # Handle missing Net Fixed Assets
                 if not net_fixed_assets and balance_sheet is not None:
@@ -561,31 +557,11 @@ def index():
                 else:
                     invested_capital = None
                 
-                if invested_capital and ebit is not None and invested_capital != 0:
-                    return_on_capital = (ebit / invested_capital) * 100
-                else:
-                    return_on_capital = None
-
-                # Make a Buy/Not Buy Decision based on Earnings Yield and Return on Capital
-                if earnings_yield is not None and return_on_capital is not None:
-                    if earnings_yield > 40 and return_on_capital > 40:
-                        buy_decision = "Not Buy"
-                        decision_class = "danger"
-                    elif (earnings_yield > 10 and return_on_capital > 15):
-                        buy_decision = "Strong Buy"
-                        decision_class = "success"
-                    elif earnings_yield > 5 and return_on_capital > 10:
-                        buy_decision = "Buy"
-                        decision_class = "primary"
-                    elif earnings_yield > 5 or return_on_capital > 10:
-                        buy_decision = "Hold"
-                        decision_class = "warning"
-                    else:
-                        buy_decision = "Not Buy"
-                        decision_class = "danger"
-                else:
-                    buy_decision = "Insufficient Data"
-                    decision_class = "secondary"
+                # Get decision values from result
+                earnings_yield = result['earnings_yield'] 
+                return_on_capital = result['return_on_capital']
+                buy_decision = result['buy_decision']
+                decision_class = result['decision_class']
                 
                 # Format values for display
                 formatted_market_cap = format_currency(market_cap, currency)
