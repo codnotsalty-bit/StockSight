@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis Tool</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fa-solid fa-chart-line me-2"></i>Stock Analysis Tool
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#decisionCriteriaModal">
+                            <i class="fa-solid fa-info-circle me-1"></i>Decision Criteria
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" id="main-content">
+        
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark">
+                <h2 class="card-title mb-0">Stock Analysis Tool</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">Enter a stock ticker to analyze key financial metrics including dividend information.</p>
+                
+                <form method="post" id="stockForm">
+                    <div class="mb-3">
+                        <ul class="nav nav-tabs" id="analysisTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="single-tab" data-bs-toggle="tab" data-bs-target="#single-analysis" type="button" role="tab">Single Stock</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="batch-tab" data-bs-toggle="tab" data-bs-target="#batch-analysis" type="button" role="tab">Multiple Stocks</button>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content mt-3" id="analysisTabContent">
+                            <div class="tab-pane fade show active" id="single-analysis" role="tabpanel">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Enter stock ticker (e.g., AAPL)" name="ticker" id="ticker">
+                                    <button class="btn btn-primary" type="submit" id="submitBtn" name="action" value="single">
+                                        <i class="fas fa-search me-1"></i> Analyze
+                                    </button>
+                                </div>
+                                <div class="form-text">Try some examples: AAPL, MSFT, GOOGL, AMZN</div>
+                            </div>
+                            
+                            <div class="tab-pane fade" id="batch-analysis" role="tabpanel">
+                                <div class="form-group">
+                                    <textarea class="form-control" id="tickerList" name="ticker_list" rows="5" placeholder="Enter multiple tickers separated by commas, spaces, or new lines (e.g., AAPL, MSFT, GOOGL)"></textarea>
+                                </div>
+                                <div class="form-group mt-2">
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="presetTickersDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-list me-1"></i> Load Preset Ticker List
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="presetTickersDropdown">
+                                            <li><a class="dropdown-item" href="#" id="loadTechTickers">Top Tech Companies</a></li>
+                                            <li><a class="dropdown-item" href="#" id="loadFinanceTickers">Top Financial Companies</a></li>
+                                            <li><a class="dropdown-item" href="#" id="loadHealthcareTickers">Top Healthcare Companies</a></li>
+                                            <li><a class="dropdown-item" href="#" id="loadETFs">Popular ETFs</a></li>
+                                            <li><a class="dropdown-item" href="#" id="loadDividendStocks">Dividend Aristocrats</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><h6 class="dropdown-header">International Markets</h6></li>
+                                            <li><a class="dropdown-item" href="#" id="loadEuropeanStocks">Top European Stocks</a></li>
+                                            <li><a class="dropdown-item" href="#" id="loadNorwegianStocks">Top Norwegian Stocks</a></li>
+                                            <li><a class="dropdown-item" href="#" id="loadAsianStocks">Top Asian Stocks</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
+                                    <button class="btn btn-primary" type="submit" name="action" value="batch">
+                                        <i class="fas fa-table me-1"></i> Batch Analyze
+                                    </button>
+                                </div>
+                                <div class="form-text">Process multiple stocks at once to get a summary table of investment recommendations</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <div id="loading" class="text-center my-4 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Fetching financial data...</p>
+                </div>
+                
+                
+                
+                
+            </div>
+        </div>
+        
+        
+        <div id="results" class="mb-4">
+            <!-- Company Information Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Apple Inc. (AAPL)</h3>
+                    <span class="badge 
+                        bg-danger">
+                        USD 205.35
+                        
+                            
+                                <i class="fas fa-arrow-down ms-1"></i>
+                            
+                            -3.74%
+                        
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-dark mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Company Info</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Industry:</strong> Consumer Electronics</p>
+                                    <p><strong>Sector:</strong> Technology</p>
+                                    <p><strong>Country:</strong> United States</p>
+                                    <p class="mb-0"><strong>Market Cap:</strong> USD 3067.07B</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-dark mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Dividend Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Dividend Rate:</strong> USD 1.04</p>
+                                    <p><strong>Dividend Yield:</strong> 51.00%</p>
+                                    <p><strong>Ex-Dividend Date:</strong> 2025-05-12</p>
+                                    <p class="mb-0"><strong>5-Year Avg Yield:</strong> 0.57%</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-dark mb-3">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Investment Decision</h5>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="badge bg-danger p-3 fs-5 mb-2">Not Buy</div>
+                                    <p class="small text-muted">Based on Earnings Yield and Return on Capital</p>
+                                    <div class="d-flex justify-content-between mt-3">
+                                        <div>
+                                            <strong>Earnings Yield:</strong><br>
+                                            3.92%
+                                        </div>
+                                        <div>
+                                            <strong>Return on Capital:</strong><br>
+                                            -526.45%
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Financial Metrics Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Key Financial Metrics</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>Enterprise Value</th>
+                                        <td>USD 3143.75B</td>
+                                    </tr>
+                                    <tr>
+                                        <th>EBIT</th>
+                                        <td>USD 123.22B</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Debt</th>
+                                        <td>USD 106.63B</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Cash</th>
+                                        <td>USD 29.94B</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th>Net Working Capital</th>
+                                        <td>USD -23.41B</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Net Fixed Assets</th>
+                                        <td>USD 364.98B</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Invested Capital</th>
+                                        <td>USD 341.57B</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Key Ratios Chart Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Key Ratios</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>Earnings Yield</h5>
+                                <div class="ratio-value">3.92%</div>
+                                <p class="text-muted small">EBIT / Enterprise Value</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>Return on Capital</h5>
+                                <div class="ratio-value">-526.45%</div>
+                                <p class="text-muted small">EBIT / Invested Capital</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>Dividend Yield</h5>
+                                <div class="ratio-value">51.00%</div>
+                                <p class="text-muted small">Current yield based on price</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="ratio-card mb-3">
+                                <h5>Investing Decision</h5>
+                                <div class="ratio-value badge bg-danger">Not Buy</div>
+                                <p class="text-muted small">Based on financial metrics</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="ratiosChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Capital Structure Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Capital Structure</h4>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="capitalStructureChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // Store the result data for charts
+            const resultData = {
+                ticker: "AAPL",
+                earningsYield: 3.9193922450441003,
+                returnOnCapital: -526.4516129032259,
+                marketCap: 3067066712064,
+                totalDebt: 106629000000.0,
+                cash: 29943000000.0,
+                dividendYield: 51.0,
+                fiveYearAvgDividendYield: 0.57
+            };
+        </script>
+        
+    </div>
+</div>
+
+    </div>
+    
+    <!-- About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">About Stock Analysis Tool</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This tool helps analyze stocks using key financial metrics:</p>
+                    <ul>
+                        <li><strong>Enterprise Value (EV)</strong>: Market Cap + Total Debt - Cash</li>
+                        <li><strong>Earnings Yield</strong>: EBIT / Enterprise Value</li>
+                        <li><strong>Return on Capital</strong>: EBIT / (Net Working Capital + Net Fixed Assets)</li>
+                        <li><strong>Dividend Information</strong>: Current dividend yield and historical dividend data</li>
+                    </ul>
+                    <p>Data is sourced from Yahoo Finance.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decision Criteria Modal -->
+    <div class="modal fade" id="decisionCriteriaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Investment Decision Criteria</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>The investment decision is based on the following criteria:</p>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Decision</th>
+                                <th>Criteria</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-success">
+                                <td><span class="badge bg-success">Strong Buy</span></td>
+                                <td>Earnings Yield > 12% and Return on Capital > 15%</td>
+                            </tr>
+                            <tr class="table-primary">
+                                <td><span class="badge bg-primary">Buy</span></td>
+                                <td>Earnings Yield > 4% and Return on Capital > 8%</td>
+                            </tr>
+                            <tr class="table-warning">
+                                <td><span class="badge bg-warning text-dark">Hold</span></td>
+                                <td>Earnings Yield > 4% or Return on Capital > 8%</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <td><span class="badge bg-danger">Not Buy</span></td>
+                                <td>Earnings Yield < 4% and Return on Capital < 8%</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <td><span class="badge bg-danger">Not Buy</span></td>
+                                <td>Earnings Yield > 40% and Return on Capital > 40% (potential data anomaly)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="small text-muted mt-3">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        These criteria are based on value investing principles focusing on company earnings relative to price and management efficiency.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-dark">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 Stock Analysis Tool</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Main JS -->
+    <script src="/static/js/main.js"></script>
+    
+    <!-- Preset Ticker Lists For Batch Analysis -->
+    <script>
+    // Initialize preset ticker lists
+    const presetTickers = {
+        tech: "AAPL, MSFT, GOOGL, AMZN, META, NVDA, TSLA, INTC, CRM, ADBE",
+        finance: "JPM, BAC, WFC, C, GS, MS, V, MA, AXP, BLK",
+        healthcare: "JNJ, PFE, MRK, ABBV, LLY, UNH, CVS, MDT, ABT, TMO",
+        etfs: "SPY, QQQ, DIA, IWM, VTI, VEA, VWO, BND, AGG, GLD",
+        dividend: "PG, KO, JNJ, XOM, CVX, T, VZ, MMM, IBM, WMT"
+    };
+
+    // Set up event listeners for preset ticker lists
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadTechBtn = document.getElementById('loadTechTickers');
+        const loadFinanceBtn = document.getElementById('loadFinanceTickers');
+        const loadHealthcareBtn = document.getElementById('loadHealthcareTickers');
+        const loadETFsBtn = document.getElementById('loadETFs');
+        const loadDividendBtn = document.getElementById('loadDividendStocks');
+        const tickerListTextarea = document.getElementById('tickerList');
+        
+        if (loadTechBtn && tickerListTextarea) {
+            loadTechBtn.addEventListener('click', function() {
+                tickerListTextarea.value = presetTickers.tech;
+            });
+        }
+        
+        if (loadFinanceBtn && tickerListTextarea) {
+            loadFinanceBtn.addEventListener('click', function() {
+                tickerListTextarea.value = presetTickers.finance;
+            });
+        }
+        
+        if (loadHealthcareBtn && tickerListTextarea) {
+            loadHealthcareBtn.addEventListener('click', function() {
+                tickerListTextarea.value = presetTickers.healthcare;
+            });
+        }
+        
+        if (loadETFsBtn && tickerListTextarea) {
+            loadETFsBtn.addEventListener('click', function() {
+                tickerListTextarea.value = presetTickers.etfs;
+            });
+        }
+        
+        if (loadDividendBtn && tickerListTextarea) {
+            loadDividendBtn.addEventListener('click', function() {
+                tickerListTextarea.value = presetTickers.dividend;
+            });
+        }
+        
+        // Show loading spinner on form submission
+        const stockForm = document.getElementById('stockForm');
+        const loadingDiv = document.getElementById('loading');
+        
+        if (stockForm && loadingDiv) {
+            stockForm.addEventListener('submit', function() {
+                loadingDiv.classList.remove('d-none');
+            });
+        }
+    });
+    </script>
+    
+    
+
+<script src="/static/js/charts.js"></script>
+
+
+</body>
+</html>
