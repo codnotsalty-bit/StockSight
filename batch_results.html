@@ -235,7 +235,9 @@
                                     <td>5.61% <small class="text-muted">(#1)</small></td>
                                     <td>150.68% <small class="text-muted">(#2)</small></td>
                                     <td>51.00%</td>
-                                    <td>USD 0.84</td>
+                                    <td><span class="badge bg-success">0.84</span></td>
+                                    <td><span class="badge bg-success">3.6</span></td>
+                                    <td><span class="badge bg-success">0.2</span></td>
                                     <td>78.1</td>
                                     <td><span class="badge bg-primary">Buy</span></td>
                                 </tr>
@@ -250,7 +252,9 @@
                                     <td>3.33% <small class="text-muted">(#3)</small></td>
                                     <td>317.68% <small class="text-muted">(#1)</small></td>
                                     <td>76.00%</td>
-                                    <td>USD 3.32</td>
+                                    <td><span class="badge bg-warning">3.32</span></td>
+                                    <td><span class="badge bg-success">2.5</span></td>
+                                    <td><span class="badge bg-info">0.8</span></td>
                                     <td>160.5</td>
                                     <td><span class="badge bg-warning">Hold</span></td>
                                 </tr>
@@ -265,7 +269,9 @@
                                     <td>3.92% <small class="text-muted">(#2)</small></td>
                                     <td>-526.45% <small class="text-muted">(#3)</small></td>
                                     <td>51.00%</td>
-                                    <td>USD 1.04</td>
+                                    <td><span class="badge bg-warning">1.04</span></td>
+                                    <td><span class="badge bg-danger">0.8</span></td>
+                                    <td><span class="badge bg-danger">1.5</span></td>
                                     <td>-261.3</td>
                                     <td><span class="badge bg-danger">Not Buy</span></td>
                                 </tr>
@@ -366,14 +372,30 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>This tool helps analyze stocks using key financial metrics:</p>
+                    <p>This tool helps analyze stocks using key financial metrics from multiple value investing methodologies:</p>
                     <ul>
-                        <li><strong>Enterprise Value (EV)</strong>: Market Cap + Total Debt - Cash</li>
-                        <li><strong>Earnings Yield</strong>: EBIT / Enterprise Value</li>
-                        <li><strong>Return on Capital</strong>: EBIT / (Net Working Capital + Net Fixed Assets)</li>
-                        <li><strong>Dividend Information</strong>: Current dividend yield and historical dividend data</li>
+                        <li><strong>Magic Formula Metrics:</strong>
+                            <ul>
+                                <li><strong>Enterprise Value (EV)</strong>: Market Cap + Total Debt - Cash</li>
+                                <li><strong>Earnings Yield</strong>: EBIT / Enterprise Value</li>
+                                <li><strong>Return on Capital</strong>: EBIT / (Net Working Capital + Net Fixed Assets)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Graham Principles & Metrics:</strong>
+                            <ul>
+                                <li><strong>Price-to-Book Ratio</strong>: Current Price / Book Value Per Share (Green &lt; 1.5)</li>
+                                <li><strong>Current Ratio</strong>: Current Assets / Current Liabilities (Green &gt; 2.0)</li>
+                                <li><strong>Debt-to-Equity Ratio</strong>: Total Debt / Total Equity (Green &lt; 0.5)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Other Metrics:</strong>
+                            <ul>
+                                <li><strong>Dividend Information</strong>: Current dividend yield and historical data</li>
+                                <li><strong>Magic Score</strong>: Combined ranking based on Earnings Yield and Return on Capital</li>
+                            </ul>
+                        </li>
                     </ul>
-                    <p>Data is sourced from Yahoo Finance.</p>
+                    <p>Data is sourced from Yahoo Finance using annual financial data for better stability and reliability.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
