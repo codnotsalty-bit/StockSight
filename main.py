@@ -316,7 +316,7 @@ def process_financial_data(ticker, data):
     else:
         enterprise_value = None
     
-    # Calculate Earnings Yield
+    # Calculate Earnings Yield (EBIT/EV) - Key Magic Formula Metric #1
     if enterprise_value and ebit is not None and enterprise_value != 0:
         earnings_yield = (ebit / enterprise_value) * 100
     else:
@@ -332,11 +332,20 @@ def process_financial_data(ticker, data):
     else:
         invested_capital = None
     
-    # Calculate Return on Capital
+    # Calculate Return on Capital (EBIT/Invested Capital) - Key Magic Formula Metric #2
     if invested_capital and ebit is not None and invested_capital != 0:
         return_on_capital = (ebit / invested_capital) * 100
     else:
         return_on_capital = None
+        
+    # Calculate Magic Formula Rank (higher is better)
+    magic_score = 0
+    if earnings_yield is not None and return_on_capital is not None:
+        # Simple magic formula score - 
+        # We're weighting both factors equally, but could adjust weights if needed
+        magic_score = (earnings_yield / 2) + (return_on_capital / 2)
+    else:
+        magic_score = None
     
     # Make a Buy/Not Buy Decision based on Earnings Yield and Return on Capital
     if earnings_yield is not None and return_on_capital is not None:
@@ -377,6 +386,8 @@ def process_financial_data(ticker, data):
         'formatted_return_on_capital': formatted_return_on_capital,
         'dividend_yield': dividend_yield,
         'formatted_dividend_yield': formatted_dividend_yield,
+        'magic_score': magic_score,
+        'formatted_magic_score': f"{magic_score:.1f}" if magic_score is not None else "N/A",
         'buy_decision': buy_decision,
         'decision_class': decision_class
     }

@@ -175,6 +175,7 @@
                                     <th>Earnings Yield</th>
                                     <th>Return on Capital</th>
                                     <th>Dividend Yield</th>
+                                    <th>Magic Score</th>
                                     <th>Decision</th>
                                 </tr>
                             </thead>
@@ -187,6 +188,7 @@
                                     <td>{{ item.formatted_earnings_yield }}</td>
                                     <td>{{ item.formatted_return_on_capital }}</td>
                                     <td>{{ item.formatted_dividend_yield }}</td>
+                                    <td>{{ item.formatted_magic_score }}</td>
                                     <td><span class="badge bg-{{ item.decision_class }}">{{ item.buy_decision }}</span></td>
                                 </tr>
                                 {% endfor %}
