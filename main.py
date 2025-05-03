@@ -349,6 +349,43 @@ def process_financial_data(ticker, data):
         magic_score = (earnings_yield / 2) + (return_on_capital / 2)
     else:
         magic_score = None
+        
+    # Calculate AlphaSpreads score - based on earnings quality and value
+    # AlphaSpreads looks at consistency of earnings and relative valuation
+    alpha_spreads_score = None
+    if earnings_yield is not None and dividend_yield is not None:
+        # Higher earnings yield relative to dividend yield indicates potential value
+        earnings_to_dividend_ratio = earnings_yield / max(dividend_yield, 0.1)  # Prevent division by zero
+        
+        # AlphaSpreads typically values consistency and quality
+        # A high ratio might indicate good value if earnings are consistent
+        if earnings_to_dividend_ratio > 3:  # earnings yield more than 3x dividend yield
+            alpha_spreads_score = min(100, earnings_to_dividend_ratio * 10)  # Cap at 100
+        else:
+            alpha_spreads_score = earnings_to_dividend_ratio * 20
+    
+    # Calculate Graham Calculator Intrinsic Value
+    # Benjamin Graham's formula: Value = EPS × (8.5 + 2g) × 4.4 / Y
+    # where g is growth rate, Y is AAA Corporate Bond yield (we use 4.5% as default)
+    graham_value = None
+    graham_upside = None
+    
+    # Use EPS estimate from EBIT if available
+    if ebit is not None and market_cap is not None and market_cap > 0:
+        # Estimate EPS from EBIT (rough approximation)
+        shares_outstanding = market_cap / current_price if current_price and current_price > 0 else None
+        
+        if shares_outstanding and shares_outstanding > 0:
+            estimated_eps = ebit * 0.7 / shares_outstanding  # 0.7 factor for taxes approximation
+            estimated_growth = 5.0  # Default to 5% growth if we don't have specific data
+            
+            # Graham's formula for intrinsic value
+            aaa_yield = 4.5  # Current approximate AAA corporate bond yield
+            graham_value = estimated_eps * (8.5 + 2 * estimated_growth) * 4.4 / aaa_yield
+            
+            # Calculate potential upside/downside
+            if current_price and current_price > 0:
+                graham_upside = ((graham_value / current_price) - 1) * 100
     
     # Make a Buy/Not Buy Decision based on Earnings Yield and Return on Capital
     if earnings_yield is not None and return_on_capital is not None:
@@ -377,6 +414,9 @@ def process_financial_data(ticker, data):
     formatted_return_on_capital = f"{return_on_capital:.2f}%" if return_on_capital is not None else "N/A"
     formatted_dividend_yield = f"{dividend_yield:.2f}%" if dividend_yield is not None else "N/A"
     formatted_dividend_rate = format_currency(dividend_rate, currency) if dividend_rate is not None else "N/A"
+    formatted_alpha_score = f"{alpha_spreads_score:.1f}" if alpha_spreads_score is not None else "N/A"
+    formatted_graham_value = format_currency(graham_value, currency) if graham_value is not None else "N/A"
+    formatted_graham_upside = f"{graham_upside:.1f}%" if graham_upside is not None else "N/A"
     
     # Create a simplified result object for batch processing
     result = {
@@ -394,6 +434,12 @@ def process_financial_data(ticker, data):
         'formatted_dividend_rate': formatted_dividend_rate,
         'magic_score': magic_score,
         'formatted_magic_score': f"{magic_score:.1f}" if magic_score is not None else "N/A",
+        'alpha_spreads_score': alpha_spreads_score,
+        'formatted_alpha_score': formatted_alpha_score,
+        'graham_value': graham_value,
+        'formatted_graham_value': formatted_graham_value,
+        'graham_upside': graham_upside,
+        'formatted_graham_upside': formatted_graham_upside,
         'buy_decision': buy_decision,
         'decision_class': decision_class
     }
