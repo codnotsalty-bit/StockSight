@@ -35,9 +35,6 @@
                             </div>
                             
                             <div class="tab-pane fade" id="batch-analysis" role="tabpanel">
-                                <div class="alert alert-info mb-3">
-                                    <i class="fas fa-info-circle me-2"></i> <strong>Note:</strong> For optimal performance, only up to 10 tickers will be processed at once to prevent timeouts. Please run multiple batches if needed.
-                                </div>
                                 <div class="form-group">
                                     <textarea class="form-control" id="tickerList" name="ticker_list" rows="5" placeholder="Enter multiple tickers separated by commas, spaces, or new lines (e.g., AAPL, MSFT, GOOGL)"></textarea>
                                 </div>
@@ -178,6 +175,7 @@
                                     <th>Earnings Yield</th>
                                     <th>Return on Capital</th>
                                     <th>Dividend Yield</th>
+                                    <th>Dividend Rate</th>
                                     <th>Magic Score</th>
                                     <th>Decision</th>
                                 </tr>
@@ -196,6 +194,7 @@
                                     <td>{{ item.formatted_earnings_yield }} <small class="text-muted">(#{{ item.ey_rank }})</small></td>
                                     <td>{{ item.formatted_return_on_capital }} <small class="text-muted">(#{{ item.roc_rank }})</small></td>
                                     <td>{{ item.formatted_dividend_yield }}</td>
+                                    <td>{{ item.formatted_dividend_rate }}</td>
                                     <td>{{ item.formatted_magic_score }}</td>
                                     <td><span class="badge bg-{{ item.decision_class }}">{{ item.buy_decision }}</span></td>
                                 </tr>
