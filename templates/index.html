@@ -36,9 +36,11 @@
                                     <li><a class="dropdown-item" href="#" id="loadAsianStocks">Top Asian Stocks</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li><h6 class="dropdown-header">Saved Lists</h6></li>
-                                    <li><div id="savedTickerLists" class="px-2">
-                                        <div class="text-center py-2 small text-muted" id="noSavedListsMessage">No saved lists found</div>
-                                    </div></li>
+                                    <li>
+                                        <div id="savedTickerLists" class="px-2 overflow-auto" style="max-height: 200px;">
+                                            <div class="text-center py-2 small text-muted" id="noSavedListsMessage">No saved lists found</div>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -418,6 +420,9 @@
                 deleteBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    // Prevent closing dropdown when deleting a list
+                    const dropdown = document.querySelector('.dropdown-menu');
+                    dropdown.addEventListener('click', (event) => event.stopPropagation(), { once: true });
                     deleteTickerList(list.id);
                 });
                 listItem.appendChild(deleteBtn);
@@ -426,6 +431,8 @@
                 listItem.addEventListener('click', (e) => {
                     e.preventDefault();
                     document.getElementById('tickerList').value = list.tickers;
+                    // Keep dropdown open until user explicitly closes it
+                    e.stopPropagation();
                 });
                 
                 savedTickerListsContainer.appendChild(listItem);
