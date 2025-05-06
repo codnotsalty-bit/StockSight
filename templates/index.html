@@ -15,11 +15,17 @@
                 <form method="post" id="stockForm">
                     <div class="mb-3">
                         <div class="form-group position-relative">
+                            <label for="tickerList" class="d-flex justify-content-between align-items-center mb-1">
+                                <span>Stock Tickers</span>
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-arrows-alt-v me-1"></i>Scrollable
+                                </span>
+                            </label>
                             <textarea class="form-control" id="tickerList" name="ticker_list" rows="5" style="max-height: 200px; overflow-y: auto;" placeholder="Enter multiple tickers separated by commas, spaces, or new lines (e.g., AAPL, MSFT, GOOGL)">{{ ticker_list }}</textarea>
-                            <div class="position-absolute end-0 top-50 me-2 translate-middle-y opacity-75">
-                                <div class="d-flex flex-column">
-                                    <i class="fas fa-chevron-up mb-1 text-muted small cursor-pointer" id="tickerScrollUp" style="cursor: pointer;"></i>
-                                    <i class="fas fa-chevron-down text-muted small cursor-pointer" id="tickerScrollDown" style="cursor: pointer;"></i>
+                            <div class="position-absolute end-0 top-50 me-3 translate-middle-y">
+                                <div class="d-flex flex-column bg-dark rounded p-1" style="border: 1px solid rgba(255,255,255,0.2);">
+                                    <i class="fas fa-chevron-up mb-1 text-white cursor-pointer" id="tickerScrollUp" style="cursor: pointer; font-size: 1rem;"></i>
+                                    <i class="fas fa-chevron-down text-white cursor-pointer" id="tickerScrollDown" style="cursor: pointer; font-size: 1rem;"></i>
                                 </div>
                             </div>
                         </div>
@@ -47,10 +53,10 @@
                                             <div id="savedTickerLists" class="px-2 overflow-auto" style="max-height: 200px; min-height: 50px; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; margin: 5px;">
                                                 <div class="text-center py-2 small text-muted" id="noSavedListsMessage">No saved lists found</div>
                                             </div>
-                                            <div class="position-absolute end-0 top-50 me-2 translate-middle-y opacity-75">
-                                                <div class="d-flex flex-column">
-                                                    <i class="fas fa-chevron-up mb-1 text-muted small cursor-pointer" id="savedListScrollUp" style="cursor: pointer;"></i>
-                                                    <i class="fas fa-chevron-down text-muted small cursor-pointer" id="savedListScrollDown" style="cursor: pointer;"></i>
+                                            <div class="position-absolute end-0 top-50 me-2 translate-middle-y">
+                                                <div class="d-flex flex-column bg-dark rounded p-1" style="border: 1px solid rgba(255,255,255,0.2);">
+                                                    <i class="fas fa-chevron-up mb-1 text-white cursor-pointer" id="savedListScrollUp" style="cursor: pointer; font-size: 1rem;"></i>
+                                                    <i class="fas fa-chevron-down text-white cursor-pointer" id="savedListScrollDown" style="cursor: pointer; font-size: 1rem;"></i>
                                                 </div>
                                             </div>
                                         </div>
