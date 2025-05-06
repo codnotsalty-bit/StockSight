@@ -6,7 +6,8 @@ import re
 import requests
 import pandas as pd
 import yfinance as yf
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -14,6 +15,17 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
+
+# Configure database
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///stocks.db")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize the database
+from models import db, TickerList
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 # Sample data for major stocks to use when API is rate limited
 SAMPLE_DATA = {
