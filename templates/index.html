@@ -244,14 +244,11 @@
                                     </td>
                                     <td>
                                         {% if item.graham_upside is defined and item.graham_upside is not none %}
-                                            <span class="{% if item.graham_upside > 20 %}text-success fw-bold{% elif item.graham_upside > 0 %}text-success{% elif item.graham_upside > -20 %}text-warning{% else %}text-danger{% endif %}">
-                                                {{ item.formatted_graham_value }}
-                                                <small class="{% if item.graham_upside > 0 %}text-success{% elif item.graham_upside < 0 %}text-danger{% endif %}">
-                                                    ({{ item.formatted_graham_upside }})
-                                                </small>
+                                            <span class="badge bg-{{ item.intrinsic_value_class }}" title="Intrinsic Value: {{ item.formatted_graham_value }}">
+                                                {{ item.formatted_graham_upside }}
                                             </span>
                                         {% else %}
-                                            {{ item.formatted_graham_value }}
+                                            <span class="badge bg-secondary">N/A</span>
                                         {% endif %}
                                     </td>
                                     <td><span class="badge bg-{{ item.decision_class }}">{{ item.buy_decision }}</span></td>
