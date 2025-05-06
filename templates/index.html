@@ -516,7 +516,16 @@
             // Show error message
             document.getElementById('saveErrorMessage').textContent = 'Failed to save list. Please try again.';
             document.getElementById('saveError').classList.remove('d-none');
+            
+            // Log detailed error information for debugging
             console.error('Error saving ticker list:', error);
+            
+            // Show more error details in the console
+            if (error instanceof Error) {
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+            }
         });
     }
     
