@@ -14,8 +14,14 @@
                 
                 <form method="post" id="stockForm">
                     <div class="mb-3">
-                        <div class="form-group">
+                        <div class="form-group position-relative">
                             <textarea class="form-control" id="tickerList" name="ticker_list" rows="5" style="max-height: 200px; overflow-y: auto;" placeholder="Enter multiple tickers separated by commas, spaces, or new lines (e.g., AAPL, MSFT, GOOGL)">{{ ticker_list }}</textarea>
+                            <div class="position-absolute end-0 top-50 me-2 translate-middle-y opacity-75">
+                                <div class="d-flex flex-column">
+                                    <i class="fas fa-chevron-up mb-1 text-muted small"></i>
+                                    <i class="fas fa-chevron-down text-muted small"></i>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group mt-2">
                             <div class="dropdown">
@@ -35,10 +41,18 @@
                                     <li><a class="dropdown-item" href="#" id="loadNorwegianStocks">Top Norwegian Stocks</a></li>
                                     <li><a class="dropdown-item" href="#" id="loadAsianStocks">Top Asian Stocks</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><h6 class="dropdown-header">Saved Lists</h6></li>
+                                    <li><h6 class="dropdown-header">Saved Lists <i class="fas fa-arrows-alt-v ms-2 text-muted small" title="Scroll to view more lists"></i></h6></li>
                                     <li>
-                                        <div id="savedTickerLists" class="px-2 overflow-auto" style="max-height: 200px; min-height: 50px; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; margin: 5px;">
-                                            <div class="text-center py-2 small text-muted" id="noSavedListsMessage">No saved lists found</div>
+                                        <div class="position-relative">
+                                            <div id="savedTickerLists" class="px-2 overflow-auto" style="max-height: 200px; min-height: 50px; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; margin: 5px;">
+                                                <div class="text-center py-2 small text-muted" id="noSavedListsMessage">No saved lists found</div>
+                                            </div>
+                                            <div class="position-absolute end-0 top-50 me-2 translate-middle-y opacity-75">
+                                                <div class="d-flex flex-column">
+                                                    <i class="fas fa-chevron-up mb-1 text-muted small"></i>
+                                                    <i class="fas fa-chevron-down text-muted small"></i>
+                                                </div>
+                                            </div>
                                         </div>
                                     </li>
                                 </ul>
