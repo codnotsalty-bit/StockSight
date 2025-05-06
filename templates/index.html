@@ -15,14 +15,14 @@
                 <form method="post" id="stockForm">
                     <div class="mb-3">
                         <div class="form-group">
-                            <textarea class="form-control" id="tickerList" name="ticker_list" rows="5" placeholder="Enter multiple tickers separated by commas, spaces, or new lines (e.g., AAPL, MSFT, GOOGL)"></textarea>
+                            <textarea class="form-control" id="tickerList" name="ticker_list" rows="5" style="max-height: 200px; overflow-y: auto;" placeholder="Enter multiple tickers separated by commas, spaces, or new lines (e.g., AAPL, MSFT, GOOGL)">{{ ticker_list }}</textarea>
                         </div>
                         <div class="form-group mt-2">
                             <div class="dropdown">
                                 <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="presetTickersDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-list me-1"></i> Load Preset Ticker List
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="presetTickersDropdown">
+                                <ul class="dropdown-menu dropdown-menu-end" style="width: 300px;" aria-labelledby="presetTickersDropdown" data-bs-auto-close="outside">
                                     <li><h6 class="dropdown-header">Built-in Lists</h6></li>
                                     <li><a class="dropdown-item" href="#" id="loadTechTickers">Top Tech Companies</a></li>
                                     <li><a class="dropdown-item" href="#" id="loadFinanceTickers">Top Financial Companies</a></li>
@@ -37,7 +37,7 @@
                                     <li><hr class="dropdown-divider"></li>
                                     <li><h6 class="dropdown-header">Saved Lists</h6></li>
                                     <li>
-                                        <div id="savedTickerLists" class="px-2 overflow-auto" style="max-height: 200px;">
+                                        <div id="savedTickerLists" class="px-2 overflow-auto" style="max-height: 200px; min-height: 50px; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; margin: 5px;">
                                             <div class="text-center py-2 small text-muted" id="noSavedListsMessage">No saved lists found</div>
                                         </div>
                                     </li>
