@@ -27,38 +27,48 @@
                             </div>
                         </div>
                         <div class="form-group mt-2">
-                            <div class="dropdown position-relative">
-                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="presetTickersDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-list me-1"></i> Load Preset Ticker List
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end overflow-auto" style="width: 300px; max-height: 450px;" aria-labelledby="presetTickersDropdown" data-bs-auto-close="outside" id="presetListDropdown">
-                                    <li><h6 class="dropdown-header">Built-in Lists</h6></li>
-                                    <li><a class="dropdown-item" href="#" id="loadTechTickers">Top Tech Companies</a></li>
-                                    <li><a class="dropdown-item" href="#" id="loadFinanceTickers">Top Financial Companies</a></li>
-                                    <li><a class="dropdown-item" href="#" id="loadHealthcareTickers">Top Healthcare Companies</a></li>
-                                    <li><a class="dropdown-item" href="#" id="loadETFs">Popular ETFs</a></li>
-                                    <li><a class="dropdown-item" href="#" id="loadDividendStocks">Dividend Aristocrats</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><h6 class="dropdown-header">International Markets</h6></li>
-                                    <li><a class="dropdown-item" href="#" id="loadEuropeanStocks">Top European Stocks</a></li>
-                                    <li><a class="dropdown-item" href="#" id="loadNorwegianStocks">Top Norwegian Stocks</a></li>
-                                    <li><a class="dropdown-item" href="#" id="loadAsianStocks">Top Asian Stocks</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><h6 class="dropdown-header">Saved Lists</h6></li>
-                                    <li>
-                                        <div class="position-relative">
-                                            <div id="savedTickerLists" class="px-2 overflow-auto" style="max-height: 200px; min-height: 50px; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; margin: 5px;">
-                                                <div class="text-center py-2 small text-muted" id="noSavedListsMessage">No saved lists found</div>
-                                            </div>
-                                            <div class="position-absolute end-0 top-50 me-2 translate-middle-y">
-                                                <div class="d-flex flex-column bg-dark rounded p-1" style="border: 1px solid rgba(255,255,255,0.2);">
-                                                    <i class="fas fa-chevron-up mb-1 text-white cursor-pointer" id="savedListScrollUp" style="cursor: pointer; font-size: 1rem;"></i>
-                                                    <i class="fas fa-chevron-down text-white cursor-pointer" id="savedListScrollDown" style="cursor: pointer; font-size: 1rem;"></i>
+                            <div class="d-flex gap-2">
+                                <div class="dropdown position-relative me-2">
+                                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="presetTickersDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-list me-1"></i> Load Preset Ticker List
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end overflow-auto" style="width: 300px; max-height: 450px;" aria-labelledby="presetTickersDropdown" data-bs-auto-close="outside" id="presetListDropdown">
+                                        <li><h6 class="dropdown-header">Built-in Lists</h6></li>
+                                        <li><a class="dropdown-item" href="#" id="loadTechTickers">Top Tech Companies</a></li>
+                                        <li><a class="dropdown-item" href="#" id="loadFinanceTickers">Top Financial Companies</a></li>
+                                        <li><a class="dropdown-item" href="#" id="loadHealthcareTickers">Top Healthcare Companies</a></li>
+                                        <li><a class="dropdown-item" href="#" id="loadETFs">Popular ETFs</a></li>
+                                        <li><a class="dropdown-item" href="#" id="loadDividendStocks">Dividend Aristocrats</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><h6 class="dropdown-header">International Markets</h6></li>
+                                        <li><a class="dropdown-item" href="#" id="loadEuropeanStocks">Top European Stocks</a></li>
+                                        <li><a class="dropdown-item" href="#" id="loadNorwegianStocks">Top Norwegian Stocks</a></li>
+                                        <li><a class="dropdown-item" href="#" id="loadAsianStocks">Top Asian Stocks</a></li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Separate Saved Lists Dropdown -->
+                                <div class="dropdown position-relative">
+                                    <button class="btn btn-outline-info dropdown-toggle" type="button" id="savedTickersDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-bookmark me-1"></i> My Saved Lists
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end overflow-auto" style="width: 300px; max-height: 450px;" aria-labelledby="savedTickersDropdown" data-bs-auto-close="outside">
+                                        <li><h6 class="dropdown-header">Your Saved Lists</h6></li>
+                                        <li>
+                                            <div class="position-relative">
+                                                <div id="savedTickerLists" class="px-2 overflow-auto" style="max-height: 200px; min-height: 50px; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; margin: 5px;">
+                                                    <div class="text-center py-2 small text-muted" id="noSavedListsMessage">No saved lists found</div>
+                                                </div>
+                                                <div class="position-absolute end-0 top-50 me-2 translate-middle-y">
+                                                    <div class="d-flex flex-column bg-dark rounded p-1" style="border: 1px solid rgba(255,255,255,0.2);">
+                                                        <i class="fas fa-chevron-up mb-1 text-white cursor-pointer" id="savedListScrollUp" style="cursor: pointer; font-size: 1rem;"></i>
+                                                        <i class="fas fa-chevron-down text-white cursor-pointer" id="savedListScrollDown" style="cursor: pointer; font-size: 1rem;"></i>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </li>
-                                </ul>
+                                        </li>
+                                    </ul>
+                                </div>
                                 <div class="position-fixed" style="z-index: 1100; right: 60px; margin-top: 125px; display: none;" id="presetListScrollButtons">
                                     <div class="d-flex flex-column bg-dark rounded p-2" style="border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 0 10px rgba(0,0,0,0.5);">
                                         <i class="fas fa-chevron-up mb-2 text-white cursor-pointer" id="presetListScrollUp" style="cursor: pointer; font-size: 1.2rem;"></i>
