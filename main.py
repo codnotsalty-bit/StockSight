@@ -747,7 +747,11 @@ def save_ticker_list():
             return jsonify({
                 'success': True,
                 'message': f'Ticker list "{name}" updated successfully',
-                'id': existing_list.id
+                'list': {
+                    'id': existing_list.id,
+                    'name': existing_list.name,
+                    'tickers': existing_list.tickers
+                }
             })
         else:
             # Create new list
@@ -757,7 +761,11 @@ def save_ticker_list():
             return jsonify({
                 'success': True,
                 'message': f'Ticker list "{name}" saved successfully',
-                'id': new_list.id
+                'list': {
+                    'id': new_list.id,
+                    'name': new_list.name,
+                    'tickers': new_list.tickers
+                }
             })
     except Exception as e:
         logger.error(f"Error saving ticker list: {str(e)}")

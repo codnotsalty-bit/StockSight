@@ -482,7 +482,23 @@
                 // Clear input field
                 document.getElementById('listName').value = '';
                 
-                // Refresh the saved lists
+                // Add or update the list in our local array immediately
+                if (data.list) {
+                    // Check if the list already exists in the array
+                    const existingIndex = savedLists.findIndex(list => list.id === data.list.id);
+                    if (existingIndex !== -1) {
+                        // Update existing list
+                        savedLists[existingIndex] = data.list;
+                    } else {
+                        // Add new list
+                        savedLists.push(data.list);
+                    }
+                    
+                    // Update the UI immediately
+                    updateSavedListsDropdown();
+                }
+                
+                // Also refresh from server to ensure data consistency
                 fetchSavedTickerLists();
                 
                 // Close modal after a delay
