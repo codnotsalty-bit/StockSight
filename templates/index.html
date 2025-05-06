@@ -18,8 +18,8 @@
                             <textarea class="form-control" id="tickerList" name="ticker_list" rows="5" style="max-height: 200px; overflow-y: auto;" placeholder="Enter multiple tickers separated by commas, spaces, or new lines (e.g., AAPL, MSFT, GOOGL)">{{ ticker_list }}</textarea>
                             <div class="position-absolute end-0 top-50 me-2 translate-middle-y opacity-75">
                                 <div class="d-flex flex-column">
-                                    <i class="fas fa-chevron-up mb-1 text-muted small"></i>
-                                    <i class="fas fa-chevron-down text-muted small"></i>
+                                    <i class="fas fa-chevron-up mb-1 text-muted small cursor-pointer" id="tickerScrollUp" style="cursor: pointer;"></i>
+                                    <i class="fas fa-chevron-down text-muted small cursor-pointer" id="tickerScrollDown" style="cursor: pointer;"></i>
                                 </div>
                             </div>
                         </div>
@@ -49,8 +49,8 @@
                                             </div>
                                             <div class="position-absolute end-0 top-50 me-2 translate-middle-y opacity-75">
                                                 <div class="d-flex flex-column">
-                                                    <i class="fas fa-chevron-up mb-1 text-muted small"></i>
-                                                    <i class="fas fa-chevron-down text-muted small"></i>
+                                                    <i class="fas fa-chevron-up mb-1 text-muted small cursor-pointer" id="savedListScrollUp" style="cursor: pointer;"></i>
+                                                    <i class="fas fa-chevron-down text-muted small cursor-pointer" id="savedListScrollDown" style="cursor: pointer;"></i>
                                                 </div>
                                             </div>
                                         </div>

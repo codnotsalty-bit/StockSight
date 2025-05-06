@@ -3,6 +3,48 @@ document.addEventListener('DOMContentLoaded', function() {
     const stockForm = document.getElementById('stockForm');
     const loadingIndicator = document.getElementById('loading');
     
+    // Add event listeners for scroll arrows
+    setupScrollArrows('tickerScrollUp', 'tickerScrollDown', 'tickerList');
+    setupScrollArrows('savedListScrollUp', 'savedListScrollDown', 'savedTickerLists');
+    
+    function setupScrollArrows(upButtonId, downButtonId, targetElementId) {
+        const upButton = document.getElementById(upButtonId);
+        const downButton = document.getElementById(downButtonId);
+        const targetElement = document.getElementById(targetElementId);
+        
+        if (upButton && downButton && targetElement) {
+            upButton.addEventListener('click', function() {
+                // Scroll up by 40px
+                targetElement.scrollTop -= 40;
+            });
+            
+            downButton.addEventListener('click', function() {
+                // Scroll down by 40px
+                targetElement.scrollTop += 40;
+            });
+            
+            // Show/hide arrows based on scroll position
+            targetElement.addEventListener('scroll', function() {
+                // If at the top, make the up arrow more transparent
+                if (targetElement.scrollTop === 0) {
+                    upButton.style.opacity = '0.3';
+                } else {
+                    upButton.style.opacity = '1';
+                }
+                
+                // If at the bottom, make the down arrow more transparent
+                if (targetElement.scrollTop + targetElement.clientHeight >= targetElement.scrollHeight - 5) {
+                    downButton.style.opacity = '0.3';
+                } else {
+                    downButton.style.opacity = '1';
+                }
+            });
+            
+            // Trigger initial scroll event to set the initial opacity
+            targetElement.dispatchEvent(new Event('scroll'));
+        }
+    }
+    
     if (stockForm) {
         stockForm.addEventListener('submit', function() {
             // Show loading indicator
