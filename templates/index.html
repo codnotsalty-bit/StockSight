@@ -374,18 +374,50 @@
     let savedLists = [];
     const saveTickerListModal = new bootstrap.Modal(document.getElementById('saveTickerListModal'));
     
+    // Initialize UI elements with loading states
+    const savedListsDropdownBtn = document.getElementById('savedListsDropdownBtn');
+    savedListsDropdownBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Loading...';
+    savedListsDropdownBtn.disabled = true;
+    
     // Function to fetch saved ticker lists from the server
     function fetchSavedTickerLists() {
+        // Show loading state
+        const savedListsDropdownBtn = document.getElementById('savedListsDropdownBtn');
+        savedListsDropdownBtn.disabled = true;
+        savedListsDropdownBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Loading...';
+        
         fetch('/api/ticker-lists')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server responded with status: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
+                    console.log('Successfully fetched saved lists:', data.data.length);
                     savedLists = data.data;
+                    updateSavedListsDropdown();
+                } else {
+                    console.error('API returned unsuccessful response:', data);
+                    // Set to empty array if failed
+                    savedLists = [];
                     updateSavedListsDropdown();
                 }
             })
             .catch(error => {
                 console.error('Error fetching saved ticker lists:', error);
+                
+                // Log more detailed error information
+                if (error instanceof Error) {
+                    console.error('Error name:', error.name);
+                    console.error('Error message:', error.message);
+                    console.error('Error stack:', error.stack);
+                }
+                
+                // Reset UI state
+                savedLists = [];
+                updateSavedListsDropdown();
             });
     }
     
@@ -395,17 +427,20 @@
         const noSavedListsMessage = document.getElementById('noSavedListsMessage');
         
         // Clear existing content
-        while (savedTickerListsContainer.firstChild) {
-            savedTickerListsContainer.removeChild(savedTickerListsContainer.firstChild);
-        }
+        savedTickerListsContainer.innerHTML = '';
         
-        if (savedLists.length === 0) {
-            // Show "No saved lists" message
-            noSavedListsMessage.classList.remove('d-none');
-            savedTickerListsContainer.appendChild(noSavedListsMessage);
+        console.log('Updating dropdown with saved lists:', savedLists);
+        
+        if (!savedLists || savedLists.length === 0) {
+            // Create a new message element for "No saved lists"
+            const emptyMessage = document.createElement('a');
+            emptyMessage.classList.add('dropdown-item', 'text-muted', 'text-center');
+            emptyMessage.href = '#';
+            emptyMessage.textContent = 'No saved ticker lists';
+            emptyMessage.addEventListener('click', e => e.preventDefault());
+            savedTickerListsContainer.appendChild(emptyMessage);
         } else {
-            // Hide "No saved lists" message
-            noSavedListsMessage.classList.add('d-none');
+            // We have lists, so don't show empty message
             
             // Add each saved list to the dropdown
             savedLists.forEach(list => {
@@ -443,6 +478,45 @@
                 savedTickerListsContainer.appendChild(listItem);
             });
         }
+        
+        // Update the loading indicators and empty state indicators
+        updateDropdownState();
+    }
+    
+    // Function to update the dropdown state (enabled/disabled, loading indicators)
+    function updateDropdownState() {
+        const savedListsDropdownBtn = document.getElementById('savedListsDropdownBtn');
+        
+        // Remove any existing content including spinners
+        savedListsDropdownBtn.innerHTML = '';
+        
+        // Add icon
+        const iconElement = document.createElement('i');
+        iconElement.classList.add('fas', 'fa-save', 'me-2');
+        savedListsDropdownBtn.appendChild(iconElement);
+        
+        // Add text
+        const textNode = document.createTextNode('Saved Lists');
+        savedListsDropdownBtn.appendChild(textNode);
+        
+        // Add badge with count if there are lists
+        if (savedLists && savedLists.length > 0) {
+            const badge = document.createElement('span');
+            badge.classList.add('badge', 'bg-light', 'text-dark', 'ms-2');
+            badge.textContent = savedLists.length;
+            savedListsDropdownBtn.appendChild(badge);
+            
+            // Update button styling
+            savedListsDropdownBtn.classList.add('btn-info');
+            savedListsDropdownBtn.classList.remove('btn-outline-secondary');
+        } else {
+            // Update button styling for empty state
+            savedListsDropdownBtn.classList.remove('btn-info');
+            savedListsDropdownBtn.classList.add('btn-outline-secondary');
+        }
+        
+        // Enable the dropdown button
+        savedListsDropdownBtn.disabled = false;
     }
     
     // Function to save a ticker list
@@ -532,12 +606,32 @@
     // Function to delete a ticker list
     function deleteTickerList(listId) {
         if (confirm('Are you sure you want to delete this ticker list?')) {
+            // Show a loading indicator on the dropdown button
+            const savedListsDropdownBtn = document.getElementById('savedListsDropdownBtn');
+            savedListsDropdownBtn.disabled = true;
+            
+            // Add a loading spinner if not present
+            if (!savedListsDropdownBtn.querySelector('.spinner-border')) {
+                savedListsDropdownBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saved Lists';
+            }
+            
             fetch(`/api/ticker-lists/${listId}`, {
                 method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
+                    // Display success message
+                    console.log('List deleted successfully:', listId);
+                    
                     // Remove the deleted item from the local savedLists array
                     savedLists = savedLists.filter(list => list.id !== listId);
                     
@@ -549,12 +643,23 @@
                         fetchSavedTickerLists();
                     }, 300);
                 } else {
-                    alert('Failed to delete list: ' + data.error);
+                    alert('Failed to delete list: ' + (data.error || 'Unknown error'));
+                    console.error('Server reported error:', data);
+                    updateDropdownState();
                 }
             })
             .catch(error => {
                 alert('Failed to delete list. Please try again.');
                 console.error('Error deleting ticker list:', error);
+                
+                if (error instanceof Error) {
+                    console.error('Error name:', error.name);
+                    console.error('Error message:', error.message);
+                    console.error('Error stack:', error.stack);
+                }
+                
+                // Reset the dropdown state
+                updateDropdownState();
             });
         }
     }
