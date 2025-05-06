@@ -169,6 +169,29 @@ def fetch_financial_data(ticker):
                     ex_dividend_date = None
                     five_year_avg_dividend_yield = None
             
+            # Get earnings per share and growth data
+            trailing_eps = None
+            forward_eps = None
+            earnings_growth = None
+            
+            if not use_sample_data:
+                # Get EPS data from info
+                trailing_eps = info.get('trailingEPS', None)
+                forward_eps = info.get('forwardEps', None)
+                earnings_growth = info.get('earningsGrowth', None)
+                
+                # If we don't have annual growth, try quarterly as fallback
+                if earnings_growth is None:
+                    earnings_growth = info.get('earningsQuarterlyGrowth', None)
+                
+                # Default growth rate if none available (for Graham formula)
+                if earnings_growth is None:
+                    earnings_growth = 0.05  # 5% growth
+                elif isinstance(earnings_growth, (int, float)):
+                    # Ensure growth is in decimal format (not percentage)
+                    if earnings_growth > 1:
+                        earnings_growth = earnings_growth / 100
+            
             if not use_sample_data:
                 # Market Cap (from info, not financials)
                 market_cap = info.get('marketCap', None)
@@ -361,7 +384,10 @@ def fetch_financial_data(ticker):
         'current_liabilities': current_liabilities, 
         'total_assets': total_assets,
         'total_equity': total_equity,
-        'book_value_per_share': book_value_per_share
+        'book_value_per_share': book_value_per_share,
+        'trailing_eps': trailing_eps,
+        'forward_eps': forward_eps,
+        'earnings_growth': earnings_growth
     }
     
 # Process financial data for a single ticker
@@ -386,6 +412,11 @@ def process_financial_data(ticker, data):
     total_assets = data.get('total_assets')
     total_equity = data.get('total_equity')
     book_value_per_share = data.get('book_value_per_share')
+    
+    # Get earnings per share and growth data
+    trailing_eps = data.get('trailing_eps')
+    forward_eps = data.get('forward_eps')
+    earnings_growth = data.get('earnings_growth')
     
     # Calculate Enterprise Value
     if market_cap is not None and total_debt is not None and cash is not None:
@@ -443,23 +474,72 @@ def process_financial_data(ticker, data):
     # where g is growth rate, Y is AAA Corporate Bond yield (we use 4.5% as default)
     graham_value = None
     graham_upside = None
+    intrinsic_value_class = "secondary"  # Default color class
     
-    # Use EPS estimate from EBIT if available
-    if ebit is not None and market_cap is not None and market_cap > 0:
+    # First try to use actual EPS if available
+    if trailing_eps is not None and current_price and current_price > 0:
+        # Use actual trailing EPS and growth rate if available
+        eps_to_use = trailing_eps
+        growth_to_use = earnings_growth if isinstance(earnings_growth, (int, float)) else 0.05
+        
+        # Convert growth to percentage if it's in decimal form (0.05 -> 5.0)
+        if growth_to_use < 1:
+            growth_to_use = growth_to_use * 100
+            
+        # Cap growth rate at 15% for Graham formula (he was conservative)
+        growth_to_use = min(growth_to_use, 15.0)
+        
+        # Graham's formula for intrinsic value
+        aaa_yield = 4.5  # Current approximate AAA corporate bond yield
+        graham_value = eps_to_use * (8.5 + 2 * (growth_to_use / 100)) * 4.4 / aaa_yield
+        
+        # Calculate potential upside/downside
+        if current_price > 0:
+            graham_upside = ((graham_value / current_price) - 1) * 100
+            
+            # Set color class based on upside potential
+            if graham_upside > 50:
+                intrinsic_value_class = "success"  # Deep value - more than 50% upside
+            elif graham_upside > 20:
+                intrinsic_value_class = "primary"  # Good value - 20-50% upside
+            elif graham_upside > 0:
+                intrinsic_value_class = "warning"  # Fair value - 0-20% upside
+            else:
+                intrinsic_value_class = "danger"   # Overvalued - negative upside (downside)
+    
+    # If actual EPS not available, fall back to estimate from EBIT
+    elif ebit is not None and market_cap is not None and market_cap > 0:
         # Estimate EPS from EBIT (rough approximation)
         shares_outstanding = market_cap / current_price if current_price and current_price > 0 else None
         
         if shares_outstanding and shares_outstanding > 0:
             estimated_eps = ebit * 0.7 / shares_outstanding  # 0.7 factor for taxes approximation
-            estimated_growth = 5.0  # Default to 5% growth if we don't have specific data
+            estimated_growth = earnings_growth if isinstance(earnings_growth, (int, float)) else 0.05
+            
+            # Convert growth to percentage if it's in decimal form (0.05 -> 5.0)
+            if estimated_growth < 1:
+                estimated_growth = estimated_growth * 100
+                
+            # Cap growth rate at 15% for Graham formula
+            estimated_growth = min(estimated_growth, 15.0)
             
             # Graham's formula for intrinsic value
             aaa_yield = 4.5  # Current approximate AAA corporate bond yield
-            graham_value = estimated_eps * (8.5 + 2 * estimated_growth) * 4.4 / aaa_yield
+            graham_value = estimated_eps * (8.5 + 2 * (estimated_growth / 100)) * 4.4 / aaa_yield
             
             # Calculate potential upside/downside
             if current_price and current_price > 0:
                 graham_upside = ((graham_value / current_price) - 1) * 100
+                
+                # Set color class based on upside potential
+                if graham_upside > 50:
+                    intrinsic_value_class = "success"  # Deep value - more than 50% upside
+                elif graham_upside > 20:
+                    intrinsic_value_class = "primary"  # Good value - 20-50% upside
+                elif graham_upside > 0:
+                    intrinsic_value_class = "warning"  # Fair value - 0-20% upside
+                else:
+                    intrinsic_value_class = "danger"   # Overvalued - negative upside (downside)
     
     # 1. Calculate Price-to-Book Ratio (Graham Principle #1)
     price_to_book = None
@@ -567,6 +647,7 @@ def process_financial_data(ticker, data):
         'formatted_graham_value': formatted_graham_value,
         'graham_upside': graham_upside,
         'formatted_graham_upside': formatted_graham_upside,
+        'intrinsic_value_class': intrinsic_value_class,
         
         # Add Graham's principles metrics
         'price_to_book': price_to_book,
