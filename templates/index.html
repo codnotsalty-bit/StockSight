@@ -15,11 +15,8 @@
                 <form method="post" id="stockForm">
                     <div class="mb-3">
                         <div class="form-group position-relative">
-                            <label for="tickerList" class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="tickerList" class="mb-1">
                                 <span>Stock Tickers</span>
-                                <span class="badge bg-secondary">
-                                    <i class="fas fa-arrows-alt-v me-1"></i>Scrollable
-                                </span>
                             </label>
                             <textarea class="form-control" id="tickerList" name="ticker_list" rows="5" style="max-height: 200px; overflow-y: auto;" placeholder="Enter multiple tickers separated by commas, spaces, or new lines (e.g., AAPL, MSFT, GOOGL)">{{ ticker_list }}</textarea>
                             <div class="position-absolute end-0 top-50 me-3 translate-middle-y">
@@ -35,14 +32,7 @@
                                     <i class="fas fa-list me-1"></i> Load Preset Ticker List
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end overflow-auto" style="width: 300px; max-height: 450px;" aria-labelledby="presetTickersDropdown" data-bs-auto-close="outside" id="presetListDropdown">
-                                    <li>
-                                        <div class="d-flex justify-content-between align-items-center px-3">
-                                            <h6 class="dropdown-header p-0 m-0">Built-in Lists</h6>
-                                            <span class="badge bg-secondary">
-                                                <i class="fas fa-arrows-alt-v me-1"></i>Scrollable
-                                            </span>
-                                        </div>
-                                    </li>
+                                    <li><h6 class="dropdown-header">Built-in Lists</h6></li>
                                     <li><a class="dropdown-item" href="#" id="loadTechTickers">Top Tech Companies</a></li>
                                     <li><a class="dropdown-item" href="#" id="loadFinanceTickers">Top Financial Companies</a></li>
                                     <li><a class="dropdown-item" href="#" id="loadHealthcareTickers">Top Healthcare Companies</a></li>
