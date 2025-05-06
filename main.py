@@ -17,15 +17,27 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
 
 # Configure database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///stocks.db")
+database_url = os.environ.get("DATABASE_URL")
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
 
 # Initialize the database
 from models import db, TickerList
 db.init_app(app)
 
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        logger.info("Database tables created successfully")
+    except Exception as e:
+        logger.error(f"Error creating database tables: {str(e)}")
 
 # Sample data for major stocks to use when API is rate limited
 SAMPLE_DATA = {
@@ -698,6 +710,73 @@ def get_stock_data(ticker):
         return jsonify({'error': data['error']}), 400
     
     return jsonify(data)
+
+# Route to get saved ticker lists
+@app.route('/api/ticker-lists', methods=['GET'])
+def get_ticker_lists():
+    try:
+        ticker_lists = TickerList.query.order_by(TickerList.name).all()
+        return jsonify({
+            'success': True,
+            'data': [{'id': lst.id, 'name': lst.name, 'tickers': lst.tickers} for lst in ticker_lists]
+        })
+    except Exception as e:
+        logger.error(f"Error fetching ticker lists: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Route to save a new ticker list
+@app.route('/api/ticker-lists', methods=['POST'])
+def save_ticker_list():
+    try:
+        data = request.json
+        name = data.get('name')
+        tickers = data.get('tickers')
+        
+        if not name or not tickers:
+            return jsonify({
+                'success': False,
+                'error': 'Name and tickers are required'
+            }), 400
+        
+        # Check if a list with this name already exists
+        existing_list = TickerList.query.filter_by(name=name).first()
+        if existing_list:
+            # Update existing list
+            existing_list.tickers = tickers
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'message': f'Ticker list "{name}" updated successfully',
+                'id': existing_list.id
+            })
+        else:
+            # Create new list
+            new_list = TickerList(name=name, tickers=tickers)
+            db.session.add(new_list)
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'message': f'Ticker list "{name}" saved successfully',
+                'id': new_list.id
+            })
+    except Exception as e:
+        logger.error(f"Error saving ticker list: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Route to delete a ticker list
+@app.route('/api/ticker-lists/<int:list_id>', methods=['DELETE'])
+def delete_ticker_list(list_id):
+    try:
+        ticker_list = TickerList.query.get_or_404(list_id)
+        db.session.delete(ticker_list)
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'message': f'Ticker list "{ticker_list.name}" deleted successfully'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting ticker list: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

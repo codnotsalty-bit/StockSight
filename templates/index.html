@@ -23,6 +23,7 @@
                                     <i class="fas fa-list me-1"></i> Load Preset Ticker List
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="presetTickersDropdown">
+                                    <li><h6 class="dropdown-header">Built-in Lists</h6></li>
                                     <li><a class="dropdown-item" href="#" id="loadTechTickers">Top Tech Companies</a></li>
                                     <li><a class="dropdown-item" href="#" id="loadFinanceTickers">Top Financial Companies</a></li>
                                     <li><a class="dropdown-item" href="#" id="loadHealthcareTickers">Top Healthcare Companies</a></li>
@@ -33,10 +34,18 @@
                                     <li><a class="dropdown-item" href="#" id="loadEuropeanStocks">Top European Stocks</a></li>
                                     <li><a class="dropdown-item" href="#" id="loadNorwegianStocks">Top Norwegian Stocks</a></li>
                                     <li><a class="dropdown-item" href="#" id="loadAsianStocks">Top Asian Stocks</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><h6 class="dropdown-header">Saved Lists</h6></li>
+                                    <li><div id="savedTickerLists" class="px-2">
+                                        <div class="text-center py-2 small text-muted" id="noSavedListsMessage">No saved lists found</div>
+                                    </div></li>
                                 </ul>
                             </div>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
+                            <button class="btn btn-outline-success" type="button" id="saveTickerListBtn">
+                                <i class="fas fa-save me-1"></i> Save List
+                            </button>
                             <button class="btn btn-primary" type="submit" name="action" value="batch">
                                 <i class="fas fa-table me-1"></i> Analyze Stocks
                             </button>
@@ -322,6 +331,34 @@
     </div>
 </div>
 {% endif %}
+
+<!-- Save Ticker List Modal -->
+<div class="modal fade" id="saveTickerListModal" tabindex="-1" aria-labelledby="saveTickerListModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveTickerListModalLabel">Save Ticker List</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="listName" class="form-label">List Name</label>
+                    <input type="text" class="form-control" id="listName" placeholder="Enter a name for this ticker list">
+                </div>
+                <div class="alert alert-success d-none" id="saveSuccess">
+                    <i class="fas fa-check-circle me-2"></i> <span id="saveSuccessMessage"></span>
+                </div>
+                <div class="alert alert-danger d-none" id="saveError">
+                    <i class="fas fa-exclamation-circle me-2"></i> <span id="saveErrorMessage"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmSaveList">Save List</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
