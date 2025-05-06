@@ -6,6 +6,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners for scroll arrows
     setupScrollArrows('tickerScrollUp', 'tickerScrollDown', 'tickerList');
     setupScrollArrows('savedListScrollUp', 'savedListScrollDown', 'savedTickerLists');
+    setupScrollArrows('presetListScrollUp', 'presetListScrollDown', 'presetListDropdown');
+    
+    // Show/hide preset list scroll buttons when dropdown is shown/hidden
+    const presetTickersDropdown = document.getElementById('presetTickersDropdown');
+    const presetListScrollButtons = document.getElementById('presetListScrollButtons');
+    
+    if (presetTickersDropdown && presetListScrollButtons) {
+        presetTickersDropdown.addEventListener('click', function() {
+            // Show scroll buttons when dropdown is clicked
+            setTimeout(function() {
+                presetListScrollButtons.style.display = 'block';
+            }, 100);
+        });
+        
+        // Hide scroll buttons when clicking elsewhere
+        document.addEventListener('click', function(event) {
+            if (!presetTickersDropdown.contains(event.target) && !presetListScrollButtons.contains(event.target)) {
+                presetListScrollButtons.style.display = 'none';
+            }
+        });
+    }
     
     function setupScrollArrows(upButtonId, downButtonId, targetElementId) {
         const upButton = document.getElementById(upButtonId);
