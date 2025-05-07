@@ -645,6 +645,7 @@ def process_financial_data(ticker, data):
         except Exception as e:
             logger.error(f"Error making price prediction for {ticker}: {str(e)}")
             price_prediction = None
+            prediction_class = "secondary"
     
     # Format values for display
     formatted_current_price = format_currency(current_price, currency)
