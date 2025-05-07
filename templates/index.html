@@ -182,6 +182,7 @@
                                     <th>Magic Score</th>
                                     <th>AlphaSpreads</th>
                                     <th>Intrinsic Value</th>
+                                    <th>AI Prediction</th>
                                     <th>Decision</th>
                                 </tr>
                             </thead>
@@ -249,6 +250,15 @@
                                             </span>
                                         {% else %}
                                             <span class="badge bg-secondary">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if item.price_prediction is defined and item.price_prediction is not none and item.price_prediction.prediction is defined %}
+                                            <span class="badge bg-{{ item.prediction_class }}" title="Forecast period: {{ item.price_prediction.forecast_period }} days, Confidence: {{ item.price_prediction.confidence }}">
+                                                {{ item.price_prediction.prediction }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Unknown</span>
                                         {% endif %}
                                     </td>
                                     <td><span class="badge bg-{{ item.decision_class }}">{{ item.buy_decision }}</span></td>
