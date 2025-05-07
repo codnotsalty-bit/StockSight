@@ -5,9 +5,11 @@ import random
 import re
 import requests
 import pandas as pd
+import numpy as np
 import yfinance as yf
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from stock_predictor import predict_price_movement
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -295,6 +297,15 @@ def fetch_financial_data(ticker):
                 current_price = info.get('currentPrice', None)
                 previous_close = info.get('previousClose', None)
                 
+                # Get historical price data for prediction model (last 365 days)
+                historical_data = None
+                try:
+                    historical_data = stock.history(period='1y')
+                    logger.debug(f"Retrieved historical price data for {ticker}")
+                except Exception as e:
+                    logger.error(f"Error fetching historical data for {ticker}: {str(e)}")
+                    historical_data = None
+                
                 price_change = None
                 price_change_percent = None
                 if current_price and previous_close:
@@ -387,7 +398,8 @@ def fetch_financial_data(ticker):
         'book_value_per_share': book_value_per_share,
         'trailing_eps': trailing_eps,
         'forward_eps': forward_eps,
-        'earnings_growth': earnings_growth
+        'earnings_growth': earnings_growth,
+        'historical_data': historical_data
     }
     
 # Process financial data for a single ticker
@@ -610,6 +622,30 @@ def process_financial_data(ticker, data):
         buy_decision = "Insufficient Data"
         decision_class = "secondary"
     
+    # Make price prediction using machine learning model if historical data is available
+    price_prediction = None
+    prediction_class = "secondary"
+    
+    historical_data = data.get('historical_data')
+    if historical_data is not None and not historical_data.empty and len(historical_data) >= 60:
+        try:
+            # Call the prediction function with 30-day forecast period
+            prediction_result = predict_price_movement(ticker, historical_data, forecast_period=30)
+            price_prediction = prediction_result
+            
+            # Set color class based on prediction
+            if prediction_result['prediction'] == 'Strong Bullish':
+                prediction_class = "success"
+            elif prediction_result['prediction'] == 'Bullish':
+                prediction_class = "primary"
+            elif prediction_result['prediction'] == 'Neutral':
+                prediction_class = "warning"
+            elif prediction_result['prediction'] in ['Bearish', 'Strong Bearish']:
+                prediction_class = "danger"
+        except Exception as e:
+            logger.error(f"Error making price prediction for {ticker}: {str(e)}")
+            price_prediction = None
+    
     # Format values for display
     formatted_current_price = format_currency(current_price, currency)
     formatted_earnings_yield = f"{earnings_yield:.2f}%" if earnings_yield is not None else "N/A"
@@ -663,7 +699,11 @@ def process_financial_data(ticker, data):
         'debt_to_equity_class': debt_to_equity_class,
         
         'buy_decision': buy_decision,
-        'decision_class': decision_class
+        'decision_class': decision_class,
+        
+        # Add price prediction information
+        'price_prediction': price_prediction,
+        'prediction_class': prediction_class
     }
     
     return result
