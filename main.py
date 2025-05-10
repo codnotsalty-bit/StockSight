@@ -64,7 +64,8 @@ SAMPLE_DATA = {
         "five_year_avg_dividend_yield": 0.65,
         "total_assets": 350000000000,
         "total_equity": 180000000000,
-        "book_value_per_share": 11.50
+        "book_value_per_share": 11.50,
+        "net_income": 100000000000
     },
     "MSFT": {
         "market_cap": 2600000000000,
@@ -206,6 +207,14 @@ def fetch_financial_data(ticker):
                     if ebit is None:
                         ebit = financials.get('Operating Income', [None])[0]
                 logger.debug(f"EBIT: {ebit}")
+                
+                # Net Income
+                net_income = None
+                if not financials.empty:
+                    net_income = financials.get('Net Income From Continuing Operation Net Minority Interest', [None])[0]
+                    if net_income is None:
+                        net_income = financials.get('Net Income', [None])[0]
+                logger.debug(f"Net Income: {net_income}")
                 
                 # Debt (Total Debt)
                 total_debt = None
@@ -400,7 +409,6 @@ def fetch_financial_data(ticker):
         'forward_eps': forward_eps,
         'earnings_growth': earnings_growth,
         'net_income': net_income,
-        'traditional_earnings_yield': traditional_earnings_yield,
         'historical_data': historical_data
     }
     
@@ -713,6 +721,8 @@ def process_financial_data(ticker, data):
         'formatted_current_price': formatted_current_price,
         'earnings_yield': earnings_yield,
         'formatted_earnings_yield': formatted_earnings_yield,
+        'traditional_earnings_yield': traditional_earnings_yield,
+        'formatted_traditional_earnings_yield': formatted_traditional_earnings_yield,
         'return_on_capital': return_on_capital,
         'formatted_return_on_capital': formatted_return_on_capital,
         'dividend_yield': dividend_yield,
