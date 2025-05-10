@@ -31,11 +31,8 @@
                         <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#decisionCriteriaModal">
-                            <i class="fa-solid fa-info-circle me-1"></i>View Analysis Criteria
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                            <i class="fa-solid fa-info-circle me-1"></i>About & Analysis Criteria
                         </a>
                     </li>
                 </ul>
@@ -52,7 +49,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">About Stock Analysis Tool</h5>
+                    <h5 class="modal-title">About & Analysis Criteria</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -83,23 +80,9 @@
                         <li><strong>Dividend Information</strong>: Current dividend yield and historical dividend data</li>
                     </ul>
                     <p>Data is sourced from Yahoo Finance using annual financial data for better stability and reliability.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Decision Criteria Modal -->
-    <div class="modal fade" id="decisionCriteriaModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Analysis Criteria</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
+                    
+                    <hr>
+                    <h5 class="mt-4">Analysis Criteria</h5>
                     <p>The investment decision is based on the following criteria:</p>
                     <table class="table table-striped">
                         <thead>
@@ -142,6 +125,7 @@
             </div>
         </div>
     </div>
+
 
     <footer class="footer mt-auto py-3 bg-dark">
         <div class="container-fluid px-4 text-center">
