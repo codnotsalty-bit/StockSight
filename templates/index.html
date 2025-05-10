@@ -262,6 +262,16 @@
                                             <span class="badge bg-secondary">Unknown</span>
                                         {% endif %}
                                     </td>
+                                    <td>
+                                        {% if item.long_term_recommendation is defined and item.long_term_recommendation is not none %}
+                                            <span class="badge bg-{{ item.long_term_recommendation_class }}" 
+                                                  title="{% if item.long_term_factors %}Factors: {{ item.long_term_factors|join(', ') }}{% else %}Long-term investment recommendation{% endif %}">
+                                                {{ item.long_term_recommendation }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Unknown</span>
+                                        {% endif %}
+                                    </td>
                                     <td><span class="badge bg-{{ item.decision_class }}">{{ item.buy_decision }}</span></td>
                                 </tr>
                                 {% endfor %}
