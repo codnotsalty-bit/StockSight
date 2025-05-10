@@ -625,6 +625,9 @@ def process_financial_data(ticker, data):
     # Make price prediction using machine learning model if historical data is available
     price_prediction = None
     prediction_class = "secondary"
+    long_term_recommendation = None
+    long_term_recommendation_class = "secondary"
+    long_term_factors = []
     
     historical_data = data.get('historical_data')
     if historical_data is not None and not historical_data.empty and len(historical_data) >= 60:
@@ -642,10 +645,34 @@ def process_financial_data(ticker, data):
                 prediction_class = "warning"
             elif prediction_result['prediction'] in ['Bearish', 'Strong Bearish']:
                 prediction_class = "danger"
+            
+            # Extract long-term recommendation data if available
+            if 'long_term_recommendation' in prediction_result and prediction_result['long_term_recommendation']:
+                long_term_recommendation = prediction_result['long_term_recommendation']
+                
+                # Set color class based on long-term recommendation
+                if long_term_recommendation == "Strong Long-Term Buy":
+                    long_term_recommendation_class = "success"
+                elif long_term_recommendation == "Long-Term Buy":
+                    long_term_recommendation_class = "primary"
+                elif long_term_recommendation == "Long-Term Neutral":
+                    long_term_recommendation_class = "warning"
+                elif long_term_recommendation == "Long-Term Caution":
+                    long_term_recommendation_class = "info"
+                elif long_term_recommendation == "Long-Term Avoid":
+                    long_term_recommendation_class = "danger"
+            
+            # Extract long-term factors if available
+            if 'long_term_factors' in prediction_result and prediction_result['long_term_factors']:
+                long_term_factors = prediction_result['long_term_factors']
+            
         except Exception as e:
             logger.error(f"Error making price prediction for {ticker}: {str(e)}")
             price_prediction = None
             prediction_class = "secondary"
+            long_term_recommendation = None
+            long_term_recommendation_class = "secondary"
+            long_term_factors = []
     
     # Format values for display
     formatted_current_price = format_currency(current_price, currency)
