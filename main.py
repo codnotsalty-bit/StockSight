@@ -399,6 +399,8 @@ def fetch_financial_data(ticker):
         'trailing_eps': trailing_eps,
         'forward_eps': forward_eps,
         'earnings_growth': earnings_growth,
+        'net_income': net_income,
+        'traditional_earnings_yield': traditional_earnings_yield,
         'historical_data': historical_data
     }
     
@@ -436,11 +438,15 @@ def process_financial_data(ticker, data):
     else:
         enterprise_value = None
     
-    # Calculate Earnings Yield (EBIT/EV) - Key Magic Formula Metric #1
+    # Calculate Earnings Yield using Magic Formula (EBIT/EV) - Key Magic Formula Metric #1
     if enterprise_value and ebit is not None and enterprise_value != 0:
         earnings_yield = (ebit / enterprise_value) * 100
     else:
         earnings_yield = None
+        
+    # Calculate Traditional Earnings Yield (Net Income/Market Cap)
+    traditional_earnings_yield = None
+    net_income = None
     
     # Calculate Invested Capital
     if net_fixed_assets and nwc:
@@ -466,6 +472,15 @@ def process_financial_data(ticker, data):
         magic_score = (earnings_yield / 2) + (return_on_capital / 2)
     else:
         magic_score = None
+        
+    # Calculate Traditional Earnings Yield (Net Income/Market Cap)
+    traditional_earnings_yield = None
+    net_income = data.get('net_income')
+    
+    # Calculate traditional earnings yield if we have market cap and net income
+    if market_cap is not None and market_cap > 0 and net_income is not None:
+        traditional_earnings_yield = (net_income / market_cap) * 100
+        logger.debug(f"Traditional Earnings Yield calculated: {traditional_earnings_yield:.2f}%")
         
     # Calculate AlphaSpreads score - based on earnings quality and value
     # AlphaSpreads looks at consistency of earnings and relative valuation
@@ -677,6 +692,7 @@ def process_financial_data(ticker, data):
     # Format values for display
     formatted_current_price = format_currency(current_price, currency)
     formatted_earnings_yield = f"{earnings_yield:.2f}%" if earnings_yield is not None else "N/A"
+    formatted_traditional_earnings_yield = f"{traditional_earnings_yield:.2f}%" if traditional_earnings_yield is not None else "N/A"
     formatted_return_on_capital = f"{return_on_capital:.2f}%" if return_on_capital is not None else "N/A"
     formatted_dividend_yield = f"{dividend_yield:.2f}%" if dividend_yield is not None else "N/A"
     formatted_dividend_rate = format_currency(dividend_rate, currency) if dividend_rate is not None else "N/A"
