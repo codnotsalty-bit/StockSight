@@ -18,7 +18,7 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container">
+        <div class="container-fluid px-4">
             <a class="navbar-brand" href="/">
                 <i class="fa-solid fa-chart-line me-2"></i>Stock Analysis Tool
             </a>
@@ -43,7 +43,7 @@
         </div>
     </nav>
 
-    <div class="container" id="main-content">
+    <div class="container-fluid px-4" id="main-content">
         {% block content %}{% endblock %}
     </div>
     
@@ -144,7 +144,7 @@
     </div>
 
     <footer class="footer mt-auto py-3 bg-dark">
-        <div class="container text-center">
+        <div class="container-fluid px-4 text-center">
             <span class="text-muted">© 2025 Stock Analysis Tool</span>
         </div>
     </footer>
