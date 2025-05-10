@@ -6,8 +6,11 @@
 <div class="row justify-content-center">
     <div class="col-lg-8 col-md-10">
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-dark">
+            <div class="card-header bg-dark d-flex justify-content-between align-items-center">
                 <h2 class="card-title mb-0">Stock Analysis Tool</h2>
+                <button id="showParamsBtn" class="btn btn-sm btn-outline-light">
+                    <i class="fas fa-info-circle me-1"></i> View Analysis Parameters
+                </button>
             </div>
             <div class="card-body">
                 <p class="lead">Enter a stock ticker to analyze key financial metrics including dividend information.</p>
@@ -82,6 +85,123 @@
                     <i class="fas fa-exclamation-circle me-2"></i> {{ warning_message }}
                 </div>
                 {% endif %}
+            </div>
+        </div>
+        
+        <!-- About Section with Analysis Parameters -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="mb-4" id="analysisParameters">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0">Analysis Parameters</h3>
+                            <button type="button" class="btn-close btn-close-white" aria-label="Close" id="closeParams"></button>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Financial Metrics Color Coding</h5>
+                                    <ul class="list-group mb-3">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Earnings Yield
+                                            <div>
+                                                <span class="badge bg-success">≥ 12%</span>
+                                                <span class="badge bg-primary">≥ 4%</span>
+                                                <span class="badge bg-danger">< 4%</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Return on Capital
+                                            <div>
+                                                <span class="badge bg-success">≥ 15%</span>
+                                                <span class="badge bg-primary">≥ 8%</span>
+                                                <span class="badge bg-danger">< 8%</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Dividend Yield
+                                            <div>
+                                                <span class="badge bg-success fw-bold">≥ 4%</span>
+                                                <span class="badge bg-success">≥ 2%</span>
+                                                <span class="badge text-muted">< 2%</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Price-to-Book Ratio
+                                            <div>
+                                                <span class="badge bg-success">< 1.5</span>
+                                                <span class="badge bg-primary">< 2.5</span>
+                                                <span class="badge bg-danger">≥ 2.5</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Current Ratio
+                                            <div>
+                                                <span class="badge bg-success">≥ 2</span>
+                                                <span class="badge bg-primary">≥ 1</span>
+                                                <span class="badge bg-danger">< 1</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Debt-to-Equity Ratio
+                                            <div>
+                                                <span class="badge bg-success">< 0.5</span>
+                                                <span class="badge bg-warning">< 1.0</span>
+                                                <span class="badge bg-danger">≥ 1.0</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5>Decision & Prediction Indicators</h5>
+                                    <ul class="list-group mb-3">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            AI Prediction
+                                            <div>
+                                                <span class="badge bg-success">Strong Bullish</span>
+                                                <span class="badge bg-primary">Bullish</span>
+                                                <span class="badge bg-warning">Neutral</span>
+                                                <span class="badge bg-danger">Bearish/Strong Bearish</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Long Term Recommendation
+                                            <div>
+                                                <span class="badge bg-success">Strong Long-Term Buy</span>
+                                                <span class="badge bg-primary">Long-Term Buy</span>
+                                                <span class="badge bg-warning">Long-Term Neutral</span>
+                                                <span class="badge bg-info">Long-Term Caution</span>
+                                                <span class="badge bg-danger">Long-Term Avoid</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Investment Decision
+                                            <div>
+                                                <span class="badge bg-success">Strong Buy</span>
+                                                <span class="badge bg-primary">Buy</span>
+                                                <span class="badge bg-warning">Hold</span>
+                                                <span class="badge bg-danger">Not Buy</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    
+                                    <h5>Long-Term Analysis Factors</h5>
+                                    <ul class="list-group mb-3">
+                                        <li class="list-group-item">
+                                            <small>
+                                                <strong>Golden/Death Cross:</strong> 50-day MA crossing above/below 200-day MA<br>
+                                                <strong>Trend Strength:</strong> Measures linear regression slope of long-term price movement<br>
+                                                <strong>52-week Highs/Lows:</strong> Proximity to yearly highs or lows<br>
+                                                <strong>Volatility Assessment:</strong> Evaluates price variability against benchmarks<br>
+                                                <strong>Drawdown Tracking:</strong> Maximum price drops from peaks
+                                            </small>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
