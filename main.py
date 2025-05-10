@@ -731,7 +731,12 @@ def process_financial_data(ticker, data):
         
         # Add price prediction information
         'price_prediction': price_prediction,
-        'prediction_class': prediction_class
+        'prediction_class': prediction_class,
+        
+        # Add long-term investment analysis
+        'long_term_recommendation': long_term_recommendation,
+        'long_term_recommendation_class': long_term_recommendation_class,
+        'long_term_factors': long_term_factors
     }
     
     return result
