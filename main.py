@@ -88,6 +88,7 @@ SAMPLE_DATA = {
         "five_year_avg_dividend_yield": 0.92,
         "total_assets": 390000000000,
         "total_equity": 210000000000,
+        "net_income": 72000000000,
         "book_value_per_share": 28.15
     }
 }
