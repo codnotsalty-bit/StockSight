@@ -206,6 +206,51 @@
                         </div>
                     </div>
                     
+                    <h5 class="mt-4">AI Prediction Methodology</h5>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item">
+                            <small>
+                                <strong>Data Processing:</strong> Historical price data is processed to extract technical indicators<br>
+                                <strong>Feature Engineering:</strong> Creates indicators like price changes, moving averages, volatility metrics<br>
+                                <strong>Model Training:</strong> Uses Ridge regression to predict future price movements<br>
+                                <strong>Prediction Types:</strong> Short-term prediction (30-day horizon) and long-term analysis<br>
+                                <strong>Confidence Calculation:</strong> Based on the magnitude of the predicted return
+                            </small>
+                        </li>
+                    </ul>
+                    
+                    <h5 class="mt-4">AI Prediction Signals</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Prediction</th>
+                                <th>Criteria</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-success">
+                                <td><span class="badge bg-success">Strong Bullish</span></td>
+                                <td>Predicted return > 5%</td>
+                            </tr>
+                            <tr class="table-primary">
+                                <td><span class="badge bg-primary">Bullish</span></td>
+                                <td>Predicted return between 2% and 5%</td>
+                            </tr>
+                            <tr class="table-warning">
+                                <td><span class="badge bg-warning">Neutral</span></td>
+                                <td>Predicted return between -2% and 2%</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <td><span class="badge bg-danger">Bearish</span></td>
+                                <td>Predicted return between -5% and -2%</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <td><span class="badge bg-danger">Strong Bearish</span></td>
+                                <td>Predicted return < -5%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
                     <h5 class="mt-4">Long-Term Analysis Factors</h5>
                     <ul class="list-group mb-3">
                         <li class="list-group-item">
@@ -216,6 +261,102 @@
                                 <strong>Volatility Assessment:</strong> Evaluates price variability against benchmarks<br>
                                 <strong>Drawdown Tracking:</strong> Maximum price drops from peaks
                             </small>
+                        </li>
+                    </ul>
+                    
+                    <h5 class="mt-4">Long-Term Investment Recommendation Criteria</h5>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Recommendation</th>
+                                <th>Criteria</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-success">
+                                <td><span class="badge bg-success">Strong Long-Term Buy</span></td>
+                                <td>At least 3 positive factors and positive factors outnumber negative by 2:1 ratio</td>
+                            </tr>
+                            <tr class="table-primary">
+                                <td><span class="badge bg-primary">Long-Term Buy</span></td>
+                                <td>More positive factors than negative factors</td>
+                            </tr>
+                            <tr class="table-warning">
+                                <td><span class="badge bg-warning">Long-Term Neutral</span></td>
+                                <td>Equal number of positive and negative factors</td>
+                            </tr>
+                            <tr class="table-info">
+                                <td><span class="badge bg-info">Long-Term Caution</span></td>
+                                <td>More negative factors than positive factors</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <td><span class="badge bg-danger">Long-Term Avoid</span></td>
+                                <td>At least 3 negative factors and negative factors outnumber positive by 2:1 ratio</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h5 class="mt-4">Positive Long-Term Factors</h5>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Recent Golden Cross (50-day MA crossed above 200-day MA)</small>
+                            <span class="badge bg-success">Very Bullish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Price >5% above 50-day or 200-day Moving Average</small>
+                            <span class="badge bg-success">Bullish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Strong 100-day performance (>10% gain)</small>
+                            <span class="badge bg-success">Bullish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Low volatility (<20%)</small>
+                            <span class="badge bg-success">Favorable</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Strong upward trend (R² > 0.7)</small>
+                            <span class="badge bg-success">Very Bullish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Near 52-week high (within 5%)</small>
+                            <span class="badge bg-success">Bullish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Minimal current drawdown (>-5%)</small>
+                            <span class="badge bg-success">Favorable</span>
+                        </li>
+                    </ul>
+                    
+                    <h5 class="mt-4">Negative Long-Term Factors</h5>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Recent Death Cross (50-day MA crossed below 200-day MA)</small>
+                            <span class="badge bg-danger">Very Bearish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Price >5% below 50-day or 200-day Moving Average</small>
+                            <span class="badge bg-danger">Bearish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Weak 100-day performance (>10% loss)</small>
+                            <span class="badge bg-danger">Bearish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>High volatility (>40%)</small>
+                            <span class="badge bg-danger">Unfavorable</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Strong downward trend (R² > 0.7)</small>
+                            <span class="badge bg-danger">Very Bearish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Near 52-week low (within 10%)</small>
+                            <span class="badge bg-danger">Bearish</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <small>Significant current drawdown (<-20%)</small>
+                            <span class="badge bg-danger">Unfavorable</span>
                         </li>
                     </ul>
                 </div>
