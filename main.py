@@ -453,23 +453,38 @@ def process_financial_data(ticker, data):
     else:
         earnings_yield = None
         
-    # Calculate Traditional Earnings Yield (Net Income/Market Cap)
+    # Prepare for Traditional Earnings Yield calculation later
+    # We'll need net_income from financial data
     traditional_earnings_yield = None
-    net_income = None
     
-    # Calculate Invested Capital
-    if net_fixed_assets and nwc:
+    # Calculate Invested Capital using a more comprehensive definition
+    # Traditional definition of Invested Capital = Total Assets - Current Liabilities
+    # This is more aligned with how it's calculated in financial analysis
+    invested_capital = None
+    if total_assets is not None and current_liabilities is not None:
+        invested_capital = total_assets - current_liabilities
+        logger.debug(f"Invested Capital calculated as Total Assets ({total_assets}) - Current Liabilities ({current_liabilities}) = {invested_capital}")
+    # Fallback to net_fixed_assets + nwc if total_assets or current_liabilities are not available
+    elif net_fixed_assets and nwc:
         invested_capital = net_fixed_assets + nwc
+        logger.debug(f"Invested Capital calculated as Net Fixed Assets ({net_fixed_assets}) + NWC ({nwc}) = {invested_capital}")
     elif net_fixed_assets:
         invested_capital = net_fixed_assets
+        logger.debug(f"Invested Capital calculated as Net Fixed Assets only = {invested_capital}")
     elif nwc:
         invested_capital = nwc
+        logger.debug(f"Invested Capital calculated as NWC only = {invested_capital}")
     else:
         invested_capital = None
+        logger.debug("Could not calculate Invested Capital due to missing data")
     
     # Calculate Return on Capital (EBIT/Invested Capital) - Key Magic Formula Metric #2
     if invested_capital and ebit is not None and invested_capital != 0:
+        # ROC is calculated as a percentage (e.g., 37.7%)
+        # We'll use the correct calculation for ROC: (EBIT / Invested Capital) *100
+        # Note that ebit and invested_capital are already in the same unit (millions or billions)
         return_on_capital = (ebit / invested_capital) * 100
+        logger.debug(f"ROC calculation: EBIT ({ebit}) / Invested Capital ({invested_capital}) * 100 = {return_on_capital:.2f}%")
     else:
         return_on_capital = None
         
@@ -489,7 +504,7 @@ def process_financial_data(ticker, data):
     # Calculate traditional earnings yield if we have market cap and net income
     if market_cap is not None and market_cap > 0 and net_income is not None:
         traditional_earnings_yield = (net_income / market_cap) * 100
-        logger.debug(f"Traditional Earnings Yield calculated: {traditional_earnings_yield:.2f}%")
+        logger.debug(f"Traditional Earnings Yield calculation: Net Income ({net_income}) / Market Cap ({market_cap}) * 100 = {traditional_earnings_yield:.2f}%")
         
     # Calculate AlphaSpreads score - based on earnings quality and value
     # AlphaSpreads looks at consistency of earnings and relative valuation
