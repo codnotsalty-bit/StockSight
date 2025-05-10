@@ -209,8 +209,9 @@
                                     <th style="width: 5%">Ticker</th>
                                     <th style="width: 10%">Company</th>
                                     <th style="width: 5%">Price</th>
-                                    <th style="width: 7%">EY</th>
-                                    <th style="width: 7%">ROC</th>
+                                    <th style="width: 6%">EY (EBIT/EV)</th>
+                                    <th style="width: 6%">EY (NI/MC)</th>
+                                    <th style="width: 6%">ROC</th>
                                     <th style="width: 5%">Div Yield</th>
                                     <th style="width: 5%">P/B</th>
                                     <th style="width: 5%">CR</th>
@@ -239,6 +240,11 @@
                                             {{ item.formatted_earnings_yield }}
                                         </span> 
                                         <small class="text-muted">(#{{ item.ey_rank }})</small>
+                                    </td>
+                                    <td>
+                                        <span class="{% if item.traditional_earnings_yield is defined and item.traditional_earnings_yield is not none %}{% if item.traditional_earnings_yield >= 12 %}text-success{% elif item.traditional_earnings_yield >= 4 %}text-info{% else %}text-danger{% endif %}{% else %}text-secondary{% endif %}">
+                                            {{ item.formatted_traditional_earnings_yield }}
+                                        </span>
                                     </td>
                                     <td>
                                         <span class="{% if item.return_on_capital is defined and item.return_on_capital is not none %}{% if item.return_on_capital >= 0.15 %}text-success{% elif item.return_on_capital >= 0.08 %}text-info{% else %}text-danger{% endif %}{% else %}text-secondary{% endif %}">
