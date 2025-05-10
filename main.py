@@ -157,8 +157,8 @@ def fetch_financial_data(ticker):
                     dividend_data = stock.dividends
                     dividend_rate = info.get('dividendRate', None)
                     dividend_yield = info.get('dividendYield', None)
-                    if dividend_yield is not None:
-                        dividend_yield = dividend_yield * 100  # Convert to percentage
+                    # Note: yfinance returns dividend_yield as a decimal (e.g., 0.076 for 7.6%)
+                    # Already automatically multiplied by 100 when used in formatted_dividend_yield
                     ex_dividend_date = info.get('exDividendDate', None)
                     if ex_dividend_date:
                         ex_dividend_date = pd.to_datetime(ex_dividend_date, unit='s').strftime('%Y-%m-%d')
