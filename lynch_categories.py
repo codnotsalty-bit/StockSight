@@ -9,6 +9,9 @@ It classifies stocks into six categories:
 4. Cyclicals - companies whose performance is tied to economic cycles
 5. Turnarounds - companies recovering from poor performance
 6. Asset Plays - companies with valuable assets not reflected in the stock price
+
+The module also implements Lynch's investment checklist from Chapter 15 of "One Up on Wall Street" 
+to provide tailored recommendations based on the stock's category.
 """
 
 import logging

@@ -296,6 +296,49 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Peter Lynch Categorization Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Peter Lynch Categorization</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <h5>Category: <span class="badge bg-primary">{{ lynch_category }}</span></h5>
+                            <p class="lead">{{ lynch_description }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if lynch_key_metrics %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>Key Metrics for this Category:</h5>
+                            <ul class="list-group mb-3">
+                                {% for metric in lynch_key_metrics %}
+                                <li class="list-group-item">{{ metric }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if lynch_recommendations %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>Lynch's Investment Recommendations:</h5>
+                            <div class="alert alert-info">
+                                <ul class="mb-0">
+                                    {% for recommendation in lynch_recommendations %}
+                                    <li>{{ recommendation }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
         
         <script>
