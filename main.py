@@ -717,6 +717,22 @@ def process_financial_data(ticker, data):
         # Get Lynch categorization
         lynch_analysis = categorize_stock(lynch_data)
         logger.debug(f"Lynch category for {ticker}: {lynch_analysis['category']}")
+        
+        # Get detailed evaluation against Lynch's investment checklist
+        if lynch_analysis and 'category' in lynch_analysis:
+            try:
+                category = lynch_analysis['category']
+                from lynch_categories import evaluate_stock_against_checklist
+                checklist_evaluation = evaluate_stock_against_checklist(lynch_data, category)
+                
+                # Add evaluation results to the analysis
+                lynch_analysis['meets_criteria'] = checklist_evaluation.get('meets_criteria', [])
+                lynch_analysis['needs_attention'] = checklist_evaluation.get('needs_attention', [])
+                lynch_analysis['checklist_score'] = checklist_evaluation.get('overall_score', 0)
+                logger.debug(f"Lynch checklist score for {ticker}: {lynch_analysis['checklist_score']}")
+            except Exception as e:
+                logger.error(f"Error in Lynch checklist evaluation: {str(e)}")
+                
     except Exception as e:
         logger.error(f"Error in Lynch categorization: {str(e)}")
         lynch_analysis = {

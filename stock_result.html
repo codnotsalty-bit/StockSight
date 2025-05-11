@@ -299,8 +299,15 @@
             
             <!-- Peter Lynch Categorization Card -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Peter Lynch Categorization</h4>
+                    <div>
+                        {% if checklist_score is defined and checklist_score %}
+                            <span class="badge bg-{% if checklist_score >= 4 %}success{% elif checklist_score >= 2 %}primary{% else %}secondary{% endif %} p-2">
+                                <i class="fas fa-star"></i> Score: {{ checklist_score }}/5
+                            </span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -310,33 +317,61 @@
                         </div>
                     </div>
                     
-                    {% if lynch_key_metrics %}
                     <div class="row">
-                        <div class="col-md-12">
-                            <h5>Key Metrics for this Category:</h5>
-                            <ul class="list-group mb-3">
-                                {% for metric in lynch_key_metrics %}
-                                <li class="list-group-item">{{ metric }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    {% if lynch_recommendations %}
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h5>Lynch's Investment Recommendations:</h5>
-                            <div class="alert alert-info">
-                                <ul class="mb-0">
-                                    {% for recommendation in lynch_recommendations %}
-                                    <li>{{ recommendation }}</li>
+                        <div class="col-md-6">
+                            {% if lynch_key_metrics %}
+                            <div class="mb-4">
+                                <h5>Key Metrics for this Category:</h5>
+                                <ul class="list-group mb-3">
+                                    {% for metric in lynch_key_metrics %}
+                                    <li class="list-group-item">{{ metric }}</li>
                                     {% endfor %}
                                 </ul>
                             </div>
+                            {% endif %}
+                            
+                            {% if meets_criteria is defined and meets_criteria %}
+                            <div class="mb-4">
+                                <h5>Strengths:</h5>
+                                <ul class="list-group mb-3">
+                                    {% for strength in meets_criteria %}
+                                    <li class="list-group-item list-group-item-success">
+                                        <i class="fas fa-check text-success me-2"></i> {{ strength }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {% if lynch_recommendations %}
+                            <div class="mb-4">
+                                <h5>Lynch's Investment Recommendations:</h5>
+                                <div class="alert alert-info">
+                                    <ul class="mb-0">
+                                        {% for recommendation in lynch_recommendations %}
+                                        <li>{{ recommendation }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if needs_attention is defined and needs_attention %}
+                            <div class="mb-4">
+                                <h5>Areas to Watch:</h5>
+                                <ul class="list-group mb-3">
+                                    {% for concern in needs_attention %}
+                                    <li class="list-group-item list-group-item-warning">
+                                        <i class="fas fa-exclamation-triangle text-warning me-2"></i> {{ concern }}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>

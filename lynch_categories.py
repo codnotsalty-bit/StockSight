@@ -16,8 +16,54 @@ to provide tailored recommendations based on the stock's category.
 
 import logging
 import numpy as np
+from typing import Dict, List, Any, Optional, Union
 
 logger = logging.getLogger(__name__)
+
+# Define Lynch's investment checklist for each category
+LYNCH_CHECKLISTS = {
+    "Slow Grower": [
+        "Focus on dividend yield and stability",
+        "Ensure the company isn't accumulating excessive debt",
+        "Monitor for signs of industry disruption"
+    ],
+    "Stalwart": [
+        "Look for reasonable P/E ratios relative to growth rate",
+        "Monitor for signs of overexpansion",
+        "Watch for declining profit margins",
+        "Consider buying during temporary setbacks"
+    ],
+    "Fast Grower": [
+        "Look for companies expanding within a sustainable niche market",
+        "Be cautious of companies growing too rapidly without solid fundamentals",
+        "Prefer a reasonable P/E ratio relative to growth rate (PEG ratio)",
+        "Check if the company is still in the early stages of growth"
+    ],
+    "Cyclical": [
+        "Invest during industry downturns and sell during upswings",
+        "Watch for inventory levels and capacity utilization as indicators",
+        "Compare current P/E ratio to historical cycle lows and highs",
+        "Monitor economic indicators that affect the industry"
+    ],
+    "Turnaround": [
+        "Identify specific catalysts for recovery (new management, product lines)",
+        "Ensure the company has sufficient cash flow to sustain operations during recovery",
+        "Monitor debt levels and repayment capabilities",
+        "Look for signs of improved efficiency or cost-cutting measures"
+    ],
+    "Asset Play": [
+        "Assess the true value of assets like real estate, patents, or subsidiaries",
+        "Consider the impact of debt on asset value",
+        "Look for catalysts that might unlock the hidden value",
+        "Verify that the market is significantly undervaluing the assets"
+    ],
+    "General": [
+        "Assess P/E ratio relative to company's historical P/E and industry peers",
+        "Check for lower institutional ownership (may indicate undiscovered potential)",
+        "Look for insider buying and company share buybacks as positive signals",
+        "Verify consistent and sustainable earnings growth"
+    ]
+}
 
 def categorize_stock(data):
     """
@@ -189,9 +235,135 @@ def categorize_stock(data):
     
     logger.debug(f"Categorized {data.get('ticker')} as {category}")
     
+    # Get Lynch's specific recommendations for this category
+    if category in LYNCH_CHECKLISTS:
+        recommendations = LYNCH_CHECKLISTS[category]
+    else:
+        recommendations = LYNCH_CHECKLISTS["General"]
+    
+    # Include additional category-specific metrics that were calculated
     return {
         "category": category,
         "description": category_description,
         "key_metrics": key_metrics,
         "recommendations": recommendations
     }
+
+
+def evaluate_stock_against_checklist(data: Dict[str, Any], category: str) -> Dict[str, Any]:
+    """
+    Evaluates a stock against Peter Lynch's checklist for its specific category.
+    
+    Args:
+        data (dict): Stock financial data and metrics
+        category (str): Lynch category of the stock
+        
+    Returns:
+        dict: Evaluation results including checklist items and scores
+    """
+    # Get the appropriate checklist for this category
+    checklist = LYNCH_CHECKLISTS.get(category, LYNCH_CHECKLISTS["General"])
+    
+    # Initialize evaluation results
+    evaluation = {
+        "checklist_items": checklist,
+        "meets_criteria": [],
+        "needs_attention": [],
+        "overall_score": 0
+    }
+    
+    # Extract key metrics
+    pe_ratio = data.get('pe_ratio')
+    peg_ratio = data.get('peg_ratio')
+    dividend_yield = data.get('dividend_yield')
+    debt_to_equity = data.get('debt_to_equity')
+    price_to_book = data.get('price_to_book')
+    assets_to_ev = data.get('assets_to_ev')
+    revenue_growth = data.get('revenue_growth')
+    earnings_growth = data.get('earnings_growth')
+    price_change_percent = data.get('price_change_percent')
+    
+    # Category-specific evaluations
+    if category == "Slow Grower":
+        # Evaluate for Slow Growers
+        if dividend_yield is not None and dividend_yield > 2.0:
+            evaluation["meets_criteria"].append("Good dividend yield (>2%)")
+            evaluation["overall_score"] += 1
+        else:
+            evaluation["needs_attention"].append("Dividend yield could be higher")
+        
+        if debt_to_equity is not None and debt_to_equity < 0.8:
+            evaluation["meets_criteria"].append("Reasonable debt levels")
+            evaluation["overall_score"] += 1
+        else:
+            evaluation["needs_attention"].append("Monitor debt levels")
+            
+    elif category == "Stalwart":
+        # Evaluate for Stalwarts
+        if pe_ratio is not None and earnings_growth is not None:
+            if pe_ratio < (earnings_growth * 1.5):
+                evaluation["meets_criteria"].append("Good P/E ratio relative to growth")
+                evaluation["overall_score"] += 1
+            else:
+                evaluation["needs_attention"].append("P/E ratio may be too high relative to growth")
+        
+        if price_change_percent is not None and price_change_percent < -10:
+            evaluation["meets_criteria"].append("Currently experiencing a temporary setback (potential buying opportunity)")
+            evaluation["overall_score"] += 1
+            
+    elif category == "Fast Grower":
+        # Evaluate for Fast Growers
+        if revenue_growth is not None and revenue_growth > 20:
+            evaluation["meets_criteria"].append("Strong revenue growth (>20%)")
+            evaluation["overall_score"] += 1
+        
+        if peg_ratio is not None and peg_ratio < 1.2:
+            evaluation["meets_criteria"].append("Attractive PEG ratio (<1.2)")
+            evaluation["overall_score"] += 1
+        else:
+            evaluation["needs_attention"].append("PEG ratio may be too high")
+            
+    elif category == "Cyclical":
+        # Evaluate for Cyclicals
+        if pe_ratio is not None:
+            # Simplistic assessment - ideally would compare to historical cycle
+            if pe_ratio < 10:
+                evaluation["meets_criteria"].append("Low P/E ratio (potential buying opportunity)")
+                evaluation["overall_score"] += 1
+            elif pe_ratio > 20:
+                evaluation["meets_criteria"].append("High P/E ratio (consider taking profits)")
+                evaluation["overall_score"] += 1
+            
+        if price_change_percent is not None and price_change_percent < -20:
+            evaluation["meets_criteria"].append("Currently in a downturn (potential buying opportunity)")
+            evaluation["overall_score"] += 1
+            
+    elif category == "Turnaround":
+        # Evaluate for Turnarounds
+        if debt_to_equity is not None:
+            if debt_to_equity < 2.0:
+                evaluation["meets_criteria"].append("Manageable debt level for recovery")
+                evaluation["overall_score"] += 1
+            else:
+                evaluation["needs_attention"].append("High debt level may impede recovery")
+        
+        # A positive price change after a big drop could indicate recovery in progress
+        if price_change_percent is not None and price_change_percent > 10:
+            evaluation["meets_criteria"].append("Shows signs of recovery in share price")
+            evaluation["overall_score"] += 1
+            
+    elif category == "Asset Play":
+        # Evaluate for Asset Plays
+        if price_to_book is not None and price_to_book < 1.0:
+            evaluation["meets_criteria"].append("Trading below book value")
+            evaluation["overall_score"] += 1
+        
+        if assets_to_ev is not None and assets_to_ev > 1.2:
+            evaluation["meets_criteria"].append("Assets worth more than enterprise value")
+            evaluation["overall_score"] += 1
+    
+    # Normalize score to 0-5 range
+    if evaluation["overall_score"] > 0:
+        evaluation["overall_score"] = min(5, evaluation["overall_score"])
+    
+    return evaluation
