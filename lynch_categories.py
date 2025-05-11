@@ -313,30 +313,73 @@ def evaluate_stock_against_checklist(data: Dict[str, Any], category: str) -> Dic
             
     elif category == "Fast Grower":
         # Evaluate for Fast Growers
-        if revenue_growth is not None and revenue_growth > 20:
-            evaluation["meets_criteria"].append("Strong revenue growth (>20%)")
-            evaluation["overall_score"] += 1
+        if revenue_growth is not None:
+            if revenue_growth > 25:
+                evaluation["meets_criteria"].append("Exceptional revenue growth (>25%)")
+                evaluation["overall_score"] += 1.5
+            elif revenue_growth > 20:
+                evaluation["meets_criteria"].append("Strong revenue growth (>20%)")
+                evaluation["overall_score"] += 1
+            elif revenue_growth > 15:
+                evaluation["meets_criteria"].append("Good revenue growth (>15%)")
+                evaluation["overall_score"] += 0.5
+            else:
+                evaluation["needs_attention"].append("Revenue growth may be insufficient for a Fast Grower")
         
-        if peg_ratio is not None and peg_ratio < 1.2:
-            evaluation["meets_criteria"].append("Attractive PEG ratio (<1.2)")
-            evaluation["overall_score"] += 1
-        else:
-            evaluation["needs_attention"].append("PEG ratio may be too high")
+        # Lynch emphasized that Fast Growers should be reasonably priced relative to growth
+        if peg_ratio is not None:
+            if peg_ratio < 0.8:
+                evaluation["meets_criteria"].append("Excellent PEG ratio (<0.8)")
+                evaluation["overall_score"] += 1.5
+            elif peg_ratio < 1.2:
+                evaluation["meets_criteria"].append("Attractive PEG ratio (<1.2)")
+                evaluation["overall_score"] += 1
+            elif peg_ratio < 1.5:
+                evaluation["meets_criteria"].append("Acceptable PEG ratio (<1.5)")
+                evaluation["overall_score"] += 0.5
+            else:
+                evaluation["needs_attention"].append("PEG ratio may be too high for growth rate")
+                
+        # Lynch favored companies that could expand nationally/internationally
+        industry = data.get('industry')
+        if industry in ["Retail", "Restaurants", "Consumer Services", "Technology"]:
+            evaluation["meets_criteria"].append("Industry with strong expansion potential")
+            evaluation["overall_score"] += 0.5
             
     elif category == "Cyclical":
         # Evaluate for Cyclicals
+        # Lynch emphasized buying cyclicals during downturns (when P/E is low) and selling during booms
         if pe_ratio is not None:
             # Simplistic assessment - ideally would compare to historical cycle
-            if pe_ratio < 10:
+            if pe_ratio < 8:
+                evaluation["meets_criteria"].append("Very low P/E ratio (strong buying opportunity)")
+                evaluation["overall_score"] += 1.5
+            elif pe_ratio < 12:
                 evaluation["meets_criteria"].append("Low P/E ratio (potential buying opportunity)")
                 evaluation["overall_score"] += 1
-            elif pe_ratio > 20:
-                evaluation["meets_criteria"].append("High P/E ratio (consider taking profits)")
+            elif pe_ratio > 25:
+                evaluation["needs_attention"].append("Very high P/E ratio (consider taking profits)")
+            elif pe_ratio > 18:
+                evaluation["needs_attention"].append("High P/E ratio (approaching peak valuation)")
+        
+        # Price movement assessment
+        if price_change_percent is not None:
+            if price_change_percent < -30:
+                evaluation["meets_criteria"].append("Significant downturn (strong buying opportunity)")
+                evaluation["overall_score"] += 1.5
+            elif price_change_percent < -20:
+                evaluation["meets_criteria"].append("Currently in a downturn (potential buying opportunity)")
                 evaluation["overall_score"] += 1
-            
-        if price_change_percent is not None and price_change_percent < -20:
-            evaluation["meets_criteria"].append("Currently in a downturn (potential buying opportunity)")
-            evaluation["overall_score"] += 1
+            elif price_change_percent > 50:
+                evaluation["needs_attention"].append("Significant upturn (consider taking profits)")
+        
+        # Industry assessment
+        industry = data.get('industry')
+        cyclical_industries = ["Automotive", "Steel", "Chemicals", "Construction", 
+                              "Manufacturing", "Airlines", "Hotels", "Energy"]
+        if industry in cyclical_industries:
+            evaluation["meets_criteria"].append(f"Confirmed cyclical industry: {industry}")
+            evaluation["overall_score"] += 0.5
             
     elif category == "Turnaround":
         # Evaluate for Turnarounds
@@ -354,13 +397,30 @@ def evaluate_stock_against_checklist(data: Dict[str, Any], category: str) -> Dic
             
     elif category == "Asset Play":
         # Evaluate for Asset Plays
-        if price_to_book is not None and price_to_book < 1.0:
-            evaluation["meets_criteria"].append("Trading below book value")
-            evaluation["overall_score"] += 1
+        if price_to_book is not None:
+            if price_to_book < 1.0:
+                evaluation["meets_criteria"].append("Trading below book value")
+                evaluation["overall_score"] += 1
+            elif price_to_book < 1.3:
+                evaluation["meets_criteria"].append("Trading at reasonable price-to-book ratio")
+                evaluation["overall_score"] += 0.5
+            else:
+                evaluation["needs_attention"].append("Price to book ratio may be too high for an Asset Play")
         
-        if assets_to_ev is not None and assets_to_ev > 1.2:
-            evaluation["meets_criteria"].append("Assets worth more than enterprise value")
-            evaluation["overall_score"] += 1
+        if assets_to_ev is not None:
+            if assets_to_ev > 1.2:
+                evaluation["meets_criteria"].append("Assets worth more than enterprise value")
+                evaluation["overall_score"] += 1
+            elif assets_to_ev > 0.8:
+                evaluation["meets_criteria"].append("Assets represent significant portion of enterprise value")
+                evaluation["overall_score"] += 0.5
+            else:
+                evaluation["needs_attention"].append("Enterprise value significantly higher than asset value")
+                
+        # Check if company has property/real estate that might be undervalued
+        if data.get('sector') in ['Real Estate', 'Consumer Discretionary', 'Energy']:
+            evaluation["meets_criteria"].append("Operates in sector likely to have valuable physical assets")
+            evaluation["overall_score"] += 0.5
     
     # Normalize score to 0-5 range
     if evaluation["overall_score"] > 0:

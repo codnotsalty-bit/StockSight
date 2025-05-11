@@ -841,6 +841,9 @@ def process_financial_data(ticker, data):
         'lynch_description': lynch_analysis.get('description') if lynch_analysis else "",
         'lynch_key_metrics': lynch_analysis.get('key_metrics', []) if lynch_analysis else [],
         'lynch_recommendations': lynch_analysis.get('recommendations', []) if lynch_analysis else [],
+        'meets_criteria': lynch_analysis.get('meets_criteria', []) if lynch_analysis else [],
+        'needs_attention': lynch_analysis.get('needs_attention', []) if lynch_analysis else [],
+        'checklist_score': lynch_analysis.get('checklist_score', 0) if lynch_analysis else 0,
         
         # Add Graham's principles metrics
         'price_to_book': price_to_book,
