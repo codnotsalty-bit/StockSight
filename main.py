@@ -10,6 +10,7 @@ import yfinance as yf
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from stock_predictor import predict_price_movement
+from lynch_categories import categorize_stock
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
