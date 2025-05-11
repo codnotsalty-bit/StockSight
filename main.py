@@ -662,6 +662,70 @@ def process_financial_data(ticker, data):
         buy_decision = "Insufficient Data"
         decision_class = "secondary"
     
+    # Apply Peter Lynch's categorization
+    lynch_analysis = None
+    try:
+        # Calculate annual revenue growth if possible
+        revenue_growth = None
+        financials = data.get('financials')
+        if financials is not None and not financials.empty:
+            if 'Total Revenue' in financials.index:
+                revenues = financials.loc['Total Revenue']
+                if len(revenues) >= 2:
+                    latest_revenue = revenues.iloc[0]
+                    previous_revenue = revenues.iloc[1]
+                    if previous_revenue and previous_revenue != 0:
+                        revenue_growth = ((latest_revenue / previous_revenue) - 1) * 100
+                        logger.debug(f"Revenue growth calculated: {revenue_growth:.2f}%")
+        
+        # Prepare data for Lynch categorization
+        industry = data.get('industry')
+        sector = data.get('sector')
+        price_change_percent = data.get('price_change_percent')
+            
+        lynch_data = {
+            'ticker': ticker,
+            'market_cap': market_cap,
+            'earnings_growth': earnings_growth,
+            'revenue_growth': revenue_growth, 
+            'industry': industry,
+            'sector': sector,
+            'price_change_percent': price_change_percent,
+            'book_value_per_share': book_value_per_share,
+            'current_price': current_price,
+            'total_assets': total_assets,
+            'enterprise_value': enterprise_value,
+            'pe_ratio': None,
+            'peg_ratio': None,
+            'debt_to_equity': debt_to_equity
+        }
+        
+        # Calculate P/E ratio
+        if current_price is not None and trailing_eps is not None and trailing_eps != 0:
+            lynch_data['pe_ratio'] = current_price / trailing_eps
+            logger.debug(f"P/E ratio calculated: {lynch_data['pe_ratio']:.2f}")
+            
+        # Calculate PEG ratio
+        if lynch_data['pe_ratio'] is not None and earnings_growth is not None and earnings_growth != 0:
+            # Ensure earnings_growth is in percentage form for PEG calculation
+            growth_for_peg = earnings_growth
+            if isinstance(growth_for_peg, (int, float)) and growth_for_peg < 1:
+                growth_for_peg = growth_for_peg * 100
+            lynch_data['peg_ratio'] = lynch_data['pe_ratio'] / growth_for_peg
+            logger.debug(f"PEG ratio calculated: {lynch_data['peg_ratio']:.2f}")
+        
+        # Get Lynch categorization
+        lynch_analysis = categorize_stock(lynch_data)
+        logger.debug(f"Lynch category for {ticker}: {lynch_analysis['category']}")
+    except Exception as e:
+        logger.error(f"Error in Lynch categorization: {str(e)}")
+        lynch_analysis = {
+            "category": "Unknown",
+            "description": "Unable to categorize with available data",
+            "key_metrics": [],
+            "recommendations": ["Insufficient data to provide Lynch category recommendations"]
+        }
+    
     # Make price prediction using machine learning model if historical data is available
     price_prediction = None
     prediction_class = "secondary"
@@ -755,6 +819,12 @@ def process_financial_data(ticker, data):
         'graham_upside': graham_upside,
         'formatted_graham_upside': formatted_graham_upside,
         'intrinsic_value_class': intrinsic_value_class,
+        
+        # Add Lynch categorization data
+        'lynch_category': lynch_analysis.get('category') if lynch_analysis else "Unknown",
+        'lynch_description': lynch_analysis.get('description') if lynch_analysis else "",
+        'lynch_key_metrics': lynch_analysis.get('key_metrics', []) if lynch_analysis else [],
+        'lynch_recommendations': lynch_analysis.get('recommendations', []) if lynch_analysis else [],
         
         # Add Graham's principles metrics
         'price_to_book': price_to_book,
